@@ -31,7 +31,7 @@ ifeq ($(TARGET),EMSCRIPTEN)
 	BINSUF = .html
 	LIBS += `emconfigure pkg-config --libs allegro_monolith-static-5 sdl2`
 	LIBS += -s USE_FREETYPE=1 -s USE_VORBIS=1 -s USE_OGG=1 -s USE_LIBJPEG=1 -s USE_LIBPNG=1 -s FULL_ES2=1 -s ASYNCIFY -s TOTAL_MEMORY=2147418112 -O3
-#	LIBS += --preload-file data@/data
+	LIBS += --preload-file data@/data
 else
 ifeq ($(TARGET),LINUX)
 	CXX = g++
