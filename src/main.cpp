@@ -10,6 +10,8 @@
 #include <math.h>
 #include "demo.h"
 #include "abort.h"
+#include <cstring>
+#include "openLink.h"
 
 using namespace std;
 
@@ -42,12 +44,22 @@ static void run(void)
 		al_wait_for_event(ex.queue, &event);
 
 		switch (event.type) {
+			case ALLEGRO_EVENT_DISPLAY_RESIZE:
+			{
+				ALLEGRO_DISPLAY *display = event.display.source;
+				al_acknowledge_resize(display);
+				printf("Screen size: %d, %d", event.display.width, event.display.height);
+				break;
+			}
 			case ALLEGRO_EVENT_DISPLAY_CLOSE:
 				return;
 
 			case ALLEGRO_EVENT_KEY_DOWN:
 				if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 					return;
+				if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+					openLink("https://www.liballeg.org/");
+				}
 				break;
 
 			case ALLEGRO_EVENT_TIMER:
@@ -83,6 +95,8 @@ int main(int argc, char **argv)
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+
+	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 
 	display = al_create_display(640, 480);
 	if (!display) {

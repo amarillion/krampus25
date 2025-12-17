@@ -5,10 +5,106 @@
 #include <allegro5/allegro_color.h>
 #include "abort.h"
 #include <stdio.h>
+#include <list>
+#include <string>
+#include "dom.h"
+#include <functional>
+#include "strutil.h"
+#include "multiline.h"
 
 using namespace std;
 
-#define TEST_TEXT "This is utf-8 €€€€€ multi line text output with a\nhard break,\n\ntwice even!"
+#define TEST_TEXT "<h1>📣 Notice 📣</h1>\n" \
+	"\n" \
+	"This <b>text</b> is <i>rendered</i>\n" \
+	"	in the browser using <a href=\"https://liballeg.org\">allegro</a>\n" \
+	"	and <a href=\"https://emscripten.org\">emscripten.</a>\n" \
+	"\n" \
+	"	We also support accented characters: á é í ó ú ü ñ ¿ ¡\n" \
+	"\n" \
+	"	Cool eh? 😎"
+
+struct TextSpan {
+	enum Type {
+		TYPE_PLAIN,
+		TYPE_BOLD,
+		TYPE_ITALIC,
+		TYPE_HEADER,
+		TYPE_LINK,
+		TYPE_LINEBREAK
+	};
+
+	Type type;
+
+	std::string content;
+	std::string href;  // only for TYPE_LINK
+
+	TextSpan(Type t, const std::string &c)
+		: type(t), content(c) { }
+};
+
+void visit(const xdom::DomNode &root, std::list<TextSpan> &spans) {
+	// process cdata and children in parallel
+	for (int i = 0; i < (int)root.cdata.size(); ++i) {
+		std::string cdata = root.cdata[i];
+		if (cdata != "") {
+			spans.push_back(TextSpan(TextSpan::TYPE_PLAIN, cdata));
+		}
+		if (i < (int)root.children.size()) {
+			const xdom::DomNode &child = root.children[i];
+			if (child.name == "b") {
+				std::string cdata = join(child.cdata, "");
+				spans.push_back(TextSpan(TextSpan::TYPE_BOLD, cdata));
+			} else if (child.name == "i") {
+				std::string cdata = join(child.cdata, "");
+				spans.push_back(TextSpan(TextSpan::TYPE_ITALIC, cdata));
+			} else if (child.name == "h1") {
+				std::string cdata = join(child.cdata, "");
+				spans.push_back(TextSpan(TextSpan::TYPE_HEADER, cdata));
+			} else if (child.name == "a") {
+				std::string cdata = join(child.cdata, "");
+				TextSpan linkSpan(TextSpan::TYPE_LINK, cdata);
+				linkSpan.href = child.attributes.at("href");
+				spans.push_back(linkSpan);
+			} else if (child.name == "br") {
+				spans.push_back(TextSpan(TextSpan::TYPE_LINEBREAK, ""));
+			} else {
+				// NOTE we're not recursing for known tags.
+				visit(child, spans);
+			}
+		}
+	}
+}
+
+std::string replaceAll(std::string input, const std::string &replace_word, const std::string &replace_by) {
+	// Find the first occurrence of the substring
+	size_t pos = input.find(replace_word);
+
+	// Iterate through the string and replace all
+	// occurrences
+	while (pos != string::npos) {
+		// Replace the substring with the specified string
+		input.replace(pos, replace_word.size(), replace_by);
+
+		// Find the next occurrence of the substring
+		pos = input.find(replace_word,
+						 pos + replace_by.size());
+	}
+	return input;
+}
+std::list<TextSpan> spansFromText(std::string const &text) {
+	// replace double newlines with <br> tags
+	std::string processed = "<root>" + replaceAll(text, "\n\n", "<br/>") + "</root>";
+	
+	xdom::DomParser parser = xdom::DomParser(processed);
+	xdom::DomNode root = parser.parse();
+
+	// now walk the tree emitting TextSpan objects
+	std::list<TextSpan> spans;
+	visit(root, spans);
+
+	return spans;
+}
 
 class DemoImpl: public Demo {
 	
@@ -43,21 +139,6 @@ class DemoImpl: public Demo {
 		white = al_color_name("white");
 	}
 
-	void print(char const *format, ...)
-	{
-		va_list list;
-		char message[1024];
-		int th = al_get_font_line_height(font);
-		va_start(list, format);
-		vsnprintf(message, sizeof message, format, list);
-		va_end(list);
-
-		// al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA);
-		al_draw_textf(font, text, text_x, text_y, 0, "%s", message);
-		text_y += th;
-	}
-
-
 	virtual void draw() {
 		float x, y;
 		int iw = 300;
@@ -74,15 +155,13 @@ class DemoImpl: public Demo {
 
 		set_xy(8, 8);
 
-		/* Test 2. */
-		print("Line 1");
-
-		/* Test 3. */
-		print("Line 2");
-
-		/* Test 4. */
-		print("Line 3");
-
+		// we parse html into spans
+		list<TextSpan> spans = spansFromText(TEST_TEXT);
+		float indent = 0;
+		for(auto &span : spans) {
+			int th = al_get_font_line_height(font);
+			draw_multiline_text(font, text, text_x, text_y, 400, th, 0, span.content.c_str());
+		}
 
 	}
 

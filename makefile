@@ -8,8 +8,11 @@
 
 NAME=krampus25
 
-LIBS = 
-CFLAGS = -Iinclude -W -Wall
+TWIST_HOME=../twist5
+CFLAGS = -std=c++20 -Iinclude -I$(TWIST_HOME)/include -W -Wall -Wno-unused
+LFLAGS =
+LIBS =
+
 
 ALLEGRO_MODULES=allegro allegro_primitives allegro_font allegro_main allegro_dialog allegro_image allegro_audio allegro_acodec allegro_ttf allegro_color
 
@@ -46,15 +49,14 @@ endif
 BUILDDIR=build/$(BUILD)_$(TARGET)
 OBJDIR=$(BUILDDIR)/obj
 
-LFLAGS = 
 
 BIN = $(BUILDDIR)/$(NAME)$(BINSUF)
 
 $(shell mkdir -p $(OBJDIR) >/dev/null)
 
-vpath %.cpp src
+vpath %.cpp $(TWIST_HOME)/src:src
 
-SRC = $(wildcard src/*.cpp)
+SRC = $(wildcard src/*.cpp) $(wildcard $(TWIST_HOME)/src/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 DEP = $(patsubst %.cpp, $(OBJDIR)/%.d, $(notdir $(SRC)))
 
@@ -69,4 +71,4 @@ $(OBJDIR):
 
 .PHONY: clean
 clean:
-	rm -f $(OBJ) $(BIN)
+	-$(RM) $(OBJ) $(BIN)
