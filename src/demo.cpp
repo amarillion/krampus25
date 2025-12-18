@@ -95,7 +95,8 @@ std::string replaceAll(std::string input, const std::string &replace_word, const
 std::list<TextSpan> spansFromText(std::string const &text) {
 	// replace double newlines with <br> tags
 	std::string processed = "<root>" + replaceAll(text, "\n\n", "<br/>") + "</root>";
-	
+	processed = replaceAll(processed, "\n", " "); //TODO: remove tabs and multiple spaces too?
+
 	xdom::DomParser parser = xdom::DomParser(processed);
 	xdom::DomNode root = parser.parse();
 
@@ -108,7 +109,7 @@ std::list<TextSpan> spansFromText(std::string const &text) {
 
 class DemoImpl: public Demo {
 	
-	ALLEGRO_FONT *font;
+	ALLEGRO_FONT *normal, *bold, *italic, *header;
 	ALLEGRO_COLOR background, text, white;
 
 	double timer[4], counter[4];
@@ -128,9 +129,13 @@ class DemoImpl: public Demo {
 
 	virtual void init() {
 		// ex.font = al_load_font("data/Caveat-VariableFont_wght.ttf", 16, 0);
-		font = al_load_font("data/DejaVuSans-Bold.ttf", 16, 0);
+		normal = al_load_font("data/DejaVuSans.ttf", 16, 0);
+		bold = al_load_font("data/DejaVuSans-Bold.ttf", 16, 0);
+		italic = al_load_font("data/DejaVuSans-Oblique.ttf", 16, 0);
+		header = al_load_font("data/DejaVuSans-Bold.ttf", 24, 0);
+
 		// ex.font = al_create_builtin_font();
-		if (!font) {
+		if (!normal || !bold || !italic || !header) {
 			abort_example("Font not found\n");
 		}
 		printf("Font loaded.\n");
@@ -157,10 +162,36 @@ class DemoImpl: public Demo {
 
 		// we parse html into spans
 		list<TextSpan> spans = spansFromText(TEST_TEXT);
-		float indent = 0;
+		float xcursor = 0;
+		float ycursor = 0;
 		for(auto &span : spans) {
-			int th = al_get_font_line_height(font);
-			draw_multiline_text(font, text, text_x, text_y, 400, th, 0, span.content.c_str());
+			ALLEGRO_FONT *font = nullptr;
+			ALLEGRO_COLOR color = text;
+			int th = al_get_font_line_height(normal);
+			switch(span.type) {
+				case TextSpan::TYPE_HEADER:
+					font = header;
+					th = al_get_font_line_height(font) * 1.5;
+					break;
+				case TextSpan::TYPE_BOLD:
+					font = bold;
+					break;
+				case TextSpan::TYPE_ITALIC:
+					font = italic;
+					break;
+				case TextSpan::TYPE_PLAIN:
+					font = normal;
+					break;
+				case TextSpan::TYPE_LINK:
+					font = normal;
+					color = al_color_name("blue");
+					break;
+			}
+			draw_multiline_text(font, color, text_x, text_y, &xcursor, &ycursor, 400, th, 0, span.content.c_str());
+			if (span.type == TextSpan::TYPE_LINEBREAK || span.type == TextSpan::TYPE_HEADER) {
+				xcursor = 0;
+				ycursor += th;
+			}
 		}
 
 	}
