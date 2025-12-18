@@ -180,8 +180,6 @@ static bool draw_multiline_ustr_cb(int line_num, float xcursor, float ycursor, c
    
    // TODO: line_num no longer needed, remove from callback?
 
-   printf("Drawing line %d at (%.2f, %.2f): '%s'\n", line_num, x, y, al_cstr(line));
-
    al_draw_ustr(s->font, s->color, x, y, s->flags, line);
    return true;
 }
