@@ -17,12 +17,15 @@ using namespace std;
 #define TEST_TEXT "<h1>📣 Notice 📣</h1>\n" \
 	"\n" \
 	"This <b>text</b> is <i>rendered</i>\n" \
-	"	in the browser using <a href=\"https://liballeg.org\">allegro</a>\n" \
-	"	and <a href=\"https://emscripten.org\">emscripten.</a>\n" \
+	"in the browser using <a href=\"https://liballeg.org\">allegro</a>\n" \
+	"and <a href=\"https://emscripten.org\">emscripten.</a>\n" \
 	"\n" \
 	"	We also support accented characters: á é í ó ú ü ñ ¿ ¡\n" \
 	"\n" \
-	"	Cool eh? 😎"
+	"	Cool eh? 😎\n\n" \
+	"	There are still some\n" \
+	"	<i>glitches</i> when it comes to\n" \
+	"	<b>Tab</b> characters"
 
 struct TextSpan {
 	enum Type {
@@ -112,21 +115,6 @@ class DemoImpl: public Demo {
 	ALLEGRO_FONT *normal, *bold, *italic, *header;
 	ALLEGRO_COLOR background, text, white;
 
-	double timer[4], counter[4];
-	float text_x, text_y;
-
-	void set_xy(float x, float y)
-	{
-		text_x = x;
-		text_y = y;
-	}
-
-	void get_xy(float *x, float *y)
-	{
-		*x = text_x;
-		*y = text_y;
-	}
-
 	virtual void init() {
 		// ex.font = al_load_font("data/Caveat-VariableFont_wght.ttf", 16, 0);
 		normal = al_load_font("data/DejaVuSans.ttf", 16, 0);
@@ -146,8 +134,7 @@ class DemoImpl: public Demo {
 
 	virtual void draw() {
 		float x, y;
-		int iw = 300;
-		int ih = 300;
+		int iw = 400;
 		ALLEGRO_BITMAP *screen;
 		void *data;
 		int size, i, format;
@@ -158,7 +145,6 @@ class DemoImpl: public Demo {
 
 		screen = al_get_target_bitmap();
 
-		set_xy(8, 8);
 
 		// we parse html into spans
 		list<TextSpan> spans = spansFromText(TEST_TEXT);
@@ -187,7 +173,7 @@ class DemoImpl: public Demo {
 					color = al_color_name("blue");
 					break;
 			}
-			draw_multiline_text(font, color, text_x, text_y, &xcursor, &ycursor, 400, th, 0, span.content.c_str());
+			draw_multiline_text(font, color, 8, 8, &xcursor, &ycursor, iw, th, 0, span.content.c_str());
 			if (span.type == TextSpan::TYPE_LINEBREAK || span.type == TextSpan::TYPE_HEADER) {
 				xcursor = 0;
 				ycursor += th;
