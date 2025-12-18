@@ -15,7 +15,7 @@ node {
 
 		stage('Build Linux') {
 			docker.image('amarillion/alleg5-plus-buildenv:latest').inside("-v $TWIST_HOME:$TWIST_HOME") {
-				sh "make TARGET=LINUX BUILD=STATIC TWIST_HOME=$TWIST_HOME"
+				sh "make TARGET=LINUX BUILD=RELEASE TWIST_HOME=$TWIST_HOME"
 			}
 		}
 		
