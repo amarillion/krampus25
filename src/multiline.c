@@ -47,21 +47,26 @@ static const ALLEGRO_USTR *ustr_split_next(const ALLEGRO_USTR *ustr,
  */
 static const ALLEGRO_USTR *get_next_soft_line(const ALLEGRO_USTR *ustr,
    ALLEGRO_USTR_INFO *info, int *pos,
-   const ALLEGRO_FONT *font, float max_width)
+   const ALLEGRO_FONT *font, float max_width, bool keep_first_word)
 {
    const ALLEGRO_USTR *result = NULL;
    const char *whitespace = " \t";
    int old_end = 0;
    int end = 0;
    int size = al_ustr_size(ustr);
-   bool first_word = true;
-
+   bool first_word = keep_first_word;
+   
    if (*pos >= size) {
       return NULL;
    }
 
    end = *pos;
    old_end = end;
+   if (!keep_first_word) {
+      // if we're not keeping the first word, compensate for skipping whitespace.
+      old_end--;
+   }
+
    do {
       /* On to the next word. */
       end = al_ustr_find_set_cstr(ustr, end, whitespace);
@@ -118,6 +123,7 @@ void do_multiline_ustr(const ALLEGRO_FONT *font,
    int hard_line_pos = 0, soft_line_pos = 0;
    int line_num = 0;
    bool proceed;
+   bool keep_first_word = (*xflow == 0); // if we are mid-line, don't keep the first word on this line
 
    /* For every "hard" line separated by a newline character... */
    hard_line = ustr_split_next(ustr, &hard_line_info, &hard_line_pos,
@@ -129,7 +135,7 @@ void do_multiline_ustr(const ALLEGRO_FONT *font,
       // TODO: edge cases. xflow < 0. xflow > max_width...
       soft_line =
          get_next_soft_line(hard_line, &soft_line_info, &soft_line_pos, font,
-            effective_max_width);
+            effective_max_width, keep_first_word);
       /* No soft line here because it's an empty hard line. */
       if (!soft_line) {
          /* Call the callback with empty string to indicate an empty line. */
@@ -140,13 +146,14 @@ void do_multiline_ustr(const ALLEGRO_FONT *font,
          *yflow += line_height;
       }
       while(soft_line) {
+         keep_first_word = false;
          float effective_max_width = max_width - *xflow;
          /* Call the callback on the next soft line. */
          proceed = cb(line_num, *xflow, *yflow, soft_line, extra);
          *xflow += al_get_ustr_width(font, soft_line); // TODO: avoid duplicate calculation
          if (!proceed) return;
          soft_line = get_next_soft_line(hard_line, &soft_line_info,
-            &soft_line_pos, font, max_width);
+            &soft_line_pos, font, max_width, false);
          if (soft_line) {
             line_num++;
             *xflow = 0;
