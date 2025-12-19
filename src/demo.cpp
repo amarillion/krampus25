@@ -12,21 +12,37 @@
 #include <functional>
 #include "strutil.h"
 #include "multiline.h"
+#include "rect.h"
+#include "openLink.h"
 
 using namespace std;
 
-#define TEST_TEXT "<h1>📣 Notice 📣</h1>\n" \
+#ifdef __EMSCRIPTEN__
+
+#define TEST_TEXT "<h1>Welcome to Allegro</h1>\n" \
 	"\n" \
-	"This <b>text</b> is <i>rendered</i>\n" \
+	"This <b>rich text</b> is <i>rendered</i>\n" \
 	"in the browser using <a href=\"https://liballeg.org\">allegro</a>\n" \
 	"and <a href=\"https://emscripten.org\">emscripten.</a>\n" \
 	"\n" \
-	"	We also support accented characters: á é í ó ú ü ñ ¿ ¡\n" \
+	"	Accented characters: á é í ó ú ü ñ ¿ ¡ are also supported\n" \
 	"\n" \
-	"	Cool eh? 😎\n\n" \
-	"	There are still some\n" \
-	"	<i>glitches</i> when it comes to\n" \
-	"	<b>Tab</b> characters"
+	"	Cool eh? 😎\n\n"
+
+	// "	There are still some\n" \
+	// "	<i>glitches</i> when it comes to\n" \
+	// "	<b>Tab</b> characters"
+
+#else
+#define TEST_TEXT "<h1>Welcome to Allegro</h1>\n" \
+	"\n" \
+	"This <b>rich text</b> is <i>rendered</i>\n" \
+	"using <a href=\"https://liballeg.org\">allegro</a>\n" \
+	"on the desktop.\n" \
+	"\n" \
+	"Please open the browser version at\n" \
+	"<a href=\"https://amarillion.github.io/krampus25\">https://amarillion.github.io/krampus25</a>\n"
+#endif
 
 struct TextSpan {
 	enum Type {
@@ -43,10 +59,14 @@ struct TextSpan {
 	std::string content;
 	std::string href;  // only for TYPE_LINK
 
+	std::vector<Rect> linkHotspots;
+
 	TextSpan(Type t, const std::string &c) : type(t), content(c) {
 
 	}
+
 };
+
 
 void visit(const xdom::DomNode &root, std::list<TextSpan> &spans) {
 	// process cdata and children in parallel
@@ -127,9 +147,19 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	float x = s->xoffset + xflow; //TODO: take into account alignment flags...
 	float y = s->yoffset + yflow;
 
+
 	// TODO: line_num no longer needed, remove from callback?
 	al_draw_ustr(s->font, s->color, x, y, 0, line);
 
+	if (s->span->type == TextSpan::TYPE_LINK) {
+		printf("Callback line %d at (%.2f, %.2f): '%s'\n", line_num, x, y, al_cstr(line));
+		int line_width = al_get_ustr_width(s->font, line);
+		int line_height = s->line_height;
+		Rect linkRect(x, y, line_width, line_height);
+		printf("Link hotspot: %s\n", linkRect.toString().c_str());
+		s->span->linkHotspots.push_back(linkRect);
+		// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
+	}
 	return true;
 }
 
@@ -137,6 +167,8 @@ class DemoImpl: public Demo {
 	
 	ALLEGRO_FONT *normal, *bold, *italic, *header;
 	ALLEGRO_COLOR background, text, white;
+
+	list<TextSpan> spans;
 
 	virtual void init() {
 		// ex.font = al_load_font("data/Caveat-VariableFont_wght.ttf", 16, 0);
@@ -153,6 +185,8 @@ class DemoImpl: public Demo {
 		background = al_color_name("beige");
 		text = al_color_name("black");
 		white = al_color_name("white");
+		
+		spans = spansFromText(TEST_TEXT);
 	}
 
 	virtual void draw() {
@@ -170,7 +204,6 @@ class DemoImpl: public Demo {
 
 
 		// we parse html into spans
-		list<TextSpan> spans = spansFromText(TEST_TEXT);
 		float xflow = 0;
 		float yflow = 0;
 		for(auto &span : spans) {
@@ -205,7 +238,8 @@ class DemoImpl: public Demo {
 			// draw_multiline_text(font, color, 8, 8, &xcursor, &ycursor, iw, th, 0, span.content.c_str());
 
 			ALLEGRO_USTR_INFO info;
-
+			ctx.span = &span;
+			span.linkHotspots = std::vector<Rect>();
 			do_multiline_ustr(ctx.font, &xflow, &yflow, ctx.line_height, iw, al_ref_cstr(&info, span.content.c_str()), cb, &ctx);
 
 			if (span.type == TextSpan::TYPE_LINEBREAK || span.type == TextSpan::TYPE_HEADER) {
@@ -218,6 +252,23 @@ class DemoImpl: public Demo {
 
 	virtual void update() {
 
+	}
+
+	virtual void openLinkAt(int x, int y) override {
+		printf("Checking for link at (%d, %d)\n", x, y);
+		for(auto &span : spans) {
+			if (span.type == TextSpan::TYPE_LINK) {
+				for (auto &rect : span.linkHotspots) {
+					printf("  Checking rect %s\n", rect.toString().c_str());
+					if (rect.contains(Point(x, y))) {
+						printf("Opening link: %s\n", span.href.c_str());
+						// open in browser
+						openLink(span.href.c_str());
+						return;
+					}
+				}
+			}
+		}
 	}
 
 };

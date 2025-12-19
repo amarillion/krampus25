@@ -48,7 +48,6 @@ static void run(void)
 			{
 				ALLEGRO_DISPLAY *display = event.display.source;
 				al_acknowledge_resize(display);
-				printf("Screen size: %d, %d", event.display.width, event.display.height);
 				break;
 			}
 			case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -62,6 +61,9 @@ static void run(void)
 				}
 				break;
 
+			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+				ex.demo->openLinkAt(event.mouse.x, event.mouse.y);
+				break;
 			case ALLEGRO_EVENT_TIMER:
 				need_draw = true;
 				break;
