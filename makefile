@@ -9,7 +9,8 @@
 NAME=krampus25
 
 TWIST_HOME=../twist5
-CFLAGS = -std=c++20 -Iinclude -I$(TWIST_HOME)/include -W -Wall -Wno-unused
+CCFLAGS = -std=c++20 -I$(TWIST_HOME)/include
+CFLAGS = -Iinclude -W -Wall -Wno-unused
 LFLAGS =
 LIBS =
 
@@ -29,6 +30,7 @@ endif
 endif
 
 ifeq ($(TARGET),EMSCRIPTEN)
+	CC = emcc
 	CXX = em++
 	LD = em++
 	BINSUF = .html
@@ -37,6 +39,7 @@ ifeq ($(TARGET),EMSCRIPTEN)
 	LIBS += --preload-file data@/data
 else
 ifeq ($(TARGET),LINUX)
+	CC = gcc
 	CXX = g++
 	LD = g++
 	BINSUF =
@@ -60,11 +63,14 @@ SRC = $(wildcard src/*.cpp) $(wildcard $(TWIST_HOME)/src/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 DEP = $(patsubst %.cpp, $(OBJDIR)/%.d, $(notdir $(SRC)))
 
-$(BIN) : $(OBJ) $(LIB)
+$(BIN) : $(OBJ) $(LIB) $(OBJDIR)/multiline.o
 	$(LD) $^ -o $@ $(LIBS) $(LFLAGS)
 
+$(OBJDIR)/multiline.o : src/multiline.c
+	$(CC) $(CFLAGS) -MMD -c $< -o $@
+
 $(OBJ) : $(OBJDIR)/%.o : %.cpp
-	$(CXX) $(CFLAGS) -MMD -c $< -o $@
+	$(CXX) $(CCFLAGS) $(CFLAGS) -MMD -c $< -o $@
 
 $(OBJDIR):
 	$(shell mkdir -p $(OBJDIR) >/dev/null)
