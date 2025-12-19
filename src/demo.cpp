@@ -3,6 +3,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_color.h>
+#include <allegro5/utf8.h>
 #include "abort.h"
 #include <stdio.h>
 #include <list>
@@ -42,8 +43,9 @@ struct TextSpan {
 	std::string content;
 	std::string href;  // only for TYPE_LINK
 
-	TextSpan(Type t, const std::string &c)
-		: type(t), content(c) { }
+	TextSpan(Type t, const std::string &c) : type(t), content(c) {
+
+	}
 };
 
 void visit(const xdom::DomNode &root, std::list<TextSpan> &spans) {
@@ -110,6 +112,27 @@ std::list<TextSpan> spansFromText(std::string const &text) {
 	return spans;
 }
 
+struct CallBackContext {
+	TextSpan *span;
+	float xoffset, yoffset;
+	ALLEGRO_FONT *font;
+	ALLEGRO_COLOR color;
+	float line_height;
+};
+
+bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *extra) {
+	// printf("Callback line %d at (%.2f, %.2f): '%s'\n", line_num, xcursor, ycursor, line);
+	CallBackContext *s = (CallBackContext*) extra;
+
+	float x = s->xoffset + xflow; //TODO: take into account alignment flags...
+	float y = s->yoffset + yflow;
+
+	// TODO: line_num no longer needed, remove from callback?
+	al_draw_ustr(s->font, s->color, x, y, 0, line);
+
+	return true;
+}
+
 class DemoImpl: public Demo {
 	
 	ALLEGRO_FONT *normal, *bold, *italic, *header;
@@ -148,35 +171,46 @@ class DemoImpl: public Demo {
 
 		// we parse html into spans
 		list<TextSpan> spans = spansFromText(TEST_TEXT);
-		float xcursor = 0;
-		float ycursor = 0;
+		float xflow = 0;
+		float yflow = 0;
 		for(auto &span : spans) {
-			ALLEGRO_FONT *font = nullptr;
-			ALLEGRO_COLOR color = text;
-			int th = al_get_font_line_height(normal);
+
+			CallBackContext ctx;
+			ctx.xoffset = 8;
+			ctx.yoffset = 8;
+
+			ctx.font = nullptr;
+			ctx.color = text;
+			ctx.line_height = al_get_font_line_height(normal);
 			switch(span.type) {
 				case TextSpan::TYPE_HEADER:
-					font = header;
-					th = al_get_font_line_height(font) * 1.5;
+					ctx.font = header;
+					ctx.line_height = al_get_font_line_height(header) * 1.5;
 					break;
 				case TextSpan::TYPE_BOLD:
-					font = bold;
+					ctx.font = bold;
 					break;
 				case TextSpan::TYPE_ITALIC:
-					font = italic;
+					ctx.font = italic;
 					break;
 				case TextSpan::TYPE_PLAIN:
-					font = normal;
+					ctx.font = normal;
 					break;
 				case TextSpan::TYPE_LINK:
-					font = normal;
-					color = al_color_name("blue");
+					ctx.font = normal;
+					ctx.color = al_color_name("blue");
 					break;
 			}
-			draw_multiline_text(font, color, 8, 8, &xcursor, &ycursor, iw, th, 0, span.content.c_str());
+
+			// draw_multiline_text(font, color, 8, 8, &xcursor, &ycursor, iw, th, 0, span.content.c_str());
+
+			ALLEGRO_USTR_INFO info;
+
+			do_multiline_ustr(ctx.font, &xflow, &yflow, ctx.line_height, iw, al_ref_cstr(&info, span.content.c_str()), cb, &ctx);
+
 			if (span.type == TextSpan::TYPE_LINEBREAK || span.type == TextSpan::TYPE_HEADER) {
-				xcursor = 0;
-				ycursor += th;
+				xflow = 0;
+				yflow += ctx.line_height;
 			}
 		}
 

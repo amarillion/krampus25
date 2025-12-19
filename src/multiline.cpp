@@ -107,9 +107,9 @@ static const ALLEGRO_USTR *get_next_soft_line(const ALLEGRO_USTR *ustr,
 /* Function: al_do_multiline_ustr
  */
 void do_multiline_ustr(const ALLEGRO_FONT *font, 
-   float *xcursor, float *ycursor, float line_height, float max_width,
+   float *xflow, float *yflow, float line_height, float max_width,
    const ALLEGRO_USTR *ustr,
-   bool (*cb)(int line_num, float xcursor, float ycursor, const ALLEGRO_USTR * line, void *extra),
+   bool (*cb)(int line_num, float xflow, float yflow, const ALLEGRO_USTR * line, void *extra),
    void *extra)
 {
    const char *linebreak  = "\n";
@@ -125,32 +125,32 @@ void do_multiline_ustr(const ALLEGRO_FONT *font,
    while (hard_line) {
       /* For every "soft" line in the "hard" line... */
       soft_line_pos = 0;
-      float effective_max_width = max_width - *xcursor;
-      // TODO: edge cases. xcursor < 0. xcursor > max_width...
+      float effective_max_width = max_width - *xflow;
+      // TODO: edge cases. xflow < 0. xflow > max_width...
       soft_line =
          get_next_soft_line(hard_line, &soft_line_info, &soft_line_pos, font,
             effective_max_width);
       /* No soft line here because it's an empty hard line. */
       if (!soft_line) {
          /* Call the callback with empty string to indicate an empty line. */
-         proceed = cb(line_num, *xcursor, *ycursor, al_ustr_empty_string(), extra);
+         proceed = cb(line_num, *xflow, *yflow, al_ustr_empty_string(), extra);
          if (!proceed) return;
          line_num++;
-         *xcursor = 0;
-         *ycursor += line_height;
+         *xflow = 0;
+         *yflow += line_height;
       }
       while(soft_line) {
-         float effective_max_width = max_width - *xcursor;
+         float effective_max_width = max_width - *xflow;
          /* Call the callback on the next soft line. */
-         proceed = cb(line_num, *xcursor, *ycursor, soft_line, extra);
-         *xcursor += al_get_ustr_width(font, soft_line); // TODO: avoid duplicate calculation
+         proceed = cb(line_num, *xflow, *yflow, soft_line, extra);
+         *xflow += al_get_ustr_width(font, soft_line); // TODO: avoid duplicate calculation
          if (!proceed) return;
          soft_line = get_next_soft_line(hard_line, &soft_line_info,
             &soft_line_pos, font, max_width);
          if (soft_line) {
             line_num++;
-            *xcursor = 0;
-            *ycursor += line_height;
+            *xflow = 0;
+            *yflow += line_height;
          }
       }
       hard_line = ustr_split_next(ustr, &hard_line_info, &hard_line_pos,
@@ -171,12 +171,12 @@ typedef struct DRAW_MULTILINE_USTR_EXTRA {
 /* The function draw_multiline_ustr_cb is the helper callback
  * that implements the actual drawing for al_draw_multiline_ustr.
  */
-static bool draw_multiline_ustr_cb(int line_num, float xcursor, float ycursor, const ALLEGRO_USTR *line,
+static bool draw_multiline_ustr_cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line,
    void *extra) {
    DRAW_MULTILINE_USTR_EXTRA *s = (DRAW_MULTILINE_USTR_EXTRA *)extra;
    
-   float x = s->x + xcursor; //TODO: take into account alignment flags...
-   float y = s->y + ycursor;
+   float x = s->x + xflow; //TODO: take into account alignment flags...
+   float y = s->y + yflow;
    
    // TODO: line_num no longer needed, remove from callback?
 
@@ -187,7 +187,7 @@ static bool draw_multiline_ustr_cb(int line_num, float xcursor, float ycursor, c
 /* Function: al_draw_multiline_ustr
  */
 void draw_multiline_ustr(const ALLEGRO_FONT *font,
-     ALLEGRO_COLOR color, float x, float y, float *xcursor, float *ycursor, float max_width, float line_height,
+     ALLEGRO_COLOR color, float x, float y, float *xflow, float *yflow, float max_width, float line_height,
      int flags, const ALLEGRO_USTR *ustr)
 {
    DRAW_MULTILINE_USTR_EXTRA extra;
@@ -206,19 +206,19 @@ void draw_multiline_ustr(const ALLEGRO_FONT *font,
    }
    extra.flags = flags;
 
-   do_multiline_ustr(font, xcursor, ycursor, extra.line_height, max_width, ustr, draw_multiline_ustr_cb, &extra);
+   do_multiline_ustr(font, xflow, yflow, extra.line_height, max_width, ustr, draw_multiline_ustr_cb, &extra);
 }
 
 /* Function: al_draw_multiline_text
  */
 void draw_multiline_text(const ALLEGRO_FONT *font,
-     ALLEGRO_COLOR color, float x, float y, float *xcursor, float *ycursor, float max_width, float line_height,
+     ALLEGRO_COLOR color, float x, float y, float *xflow, float *yflow, float max_width, float line_height,
      int flags, const char *text)
 {
    ALLEGRO_USTR_INFO info;
    ASSERT(font);
    ASSERT(text);
 
-   draw_multiline_ustr(font, color, x, y, xcursor, ycursor, max_width, line_height, flags,
+   draw_multiline_ustr(font, color, x, y, xflow, yflow, max_width, line_height, flags,
       al_ref_cstr(&info, text));
 }
