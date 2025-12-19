@@ -29,10 +29,6 @@ using namespace std;
 	"\n" \
 	"	Cool eh? 😎\n\n"
 
-	// "	There are still some\n" \
-	// "	<i>glitches</i> when it comes to\n" \
-	// "	<b>Tab</b> characters"
-
 #else
 #define TEST_TEXT "<h1>Welcome to Allegro</h1>\n" \
 	"\n" \
@@ -152,11 +148,9 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	al_draw_ustr(s->font, s->color, x, y, 0, line);
 
 	if (s->span->type == TextSpan::TYPE_LINK) {
-		printf("Callback line %d at (%.2f, %.2f): '%s'\n", line_num, x, y, al_cstr(line));
 		int line_width = al_get_ustr_width(s->font, line);
 		int line_height = s->line_height;
 		Rect linkRect(x, y, line_width, line_height);
-		printf("Link hotspot: %s\n", linkRect.toString().c_str());
 		s->span->linkHotspots.push_back(linkRect);
 		// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
 	}
@@ -255,11 +249,9 @@ class DemoImpl: public Demo {
 	}
 
 	virtual void openLinkAt(int x, int y) override {
-		printf("Checking for link at (%d, %d)\n", x, y);
 		for(auto &span : spans) {
 			if (span.type == TextSpan::TYPE_LINK) {
 				for (auto &rect : span.linkHotspots) {
-					printf("  Checking rect %s\n", rect.toString().c_str());
 					if (rect.contains(Point(x, y))) {
 						printf("Opening link: %s\n", span.href.c_str());
 						// open in browser
