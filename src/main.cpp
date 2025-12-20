@@ -5,6 +5,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_color.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
@@ -61,7 +62,13 @@ static void run(void)
 				}
 				break;
 
+			case ALLEGRO_EVENT_TOUCH_BEGIN:
+				ex.demo->openLinkAt(event.touch.x, event.touch.y);
+				printf("TOUCH at %f,%f", event.touch.x, event.touch.y);
+				break;
+
 			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+				printf("mouse down at %i,%i", event.mouse.x, event.mouse.y);
 				ex.demo->openLinkAt(event.mouse.x, event.mouse.y);
 				break;
 			case ALLEGRO_EVENT_TIMER:
@@ -94,16 +101,23 @@ int main(int argc, char **argv)
 
 	al_install_keyboard();
 	al_install_mouse();
+	bool touchEnabled = al_install_touch_input();
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_init_primitives_addon();
 
-	al_set_new_display_flags(ALLEGRO_RESIZABLE);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_RESIZABLE | ALLEGRO_MAXIMIZED);
 
 	display = al_create_display(640, 480);
 	if (!display) {
 		abort_example("Error creating display\n");
 	}
+
+	printf("Actual Display size: %dx%d\n",
+		al_get_display_width(display),
+		al_get_display_height(display));
+
 
 	init();
 
@@ -114,7 +128,9 @@ int main(int argc, char **argv)
 	al_register_event_source(ex.queue, al_get_mouse_event_source());
 	al_register_event_source(ex.queue, al_get_display_event_source(display));
 	al_register_event_source(ex.queue, al_get_timer_event_source(timer));
-
+	if (touchEnabled) {
+		al_register_event_source(ex.queue, al_get_touch_input_event_source());
+	}
 	al_start_timer(timer);
 	run();
 

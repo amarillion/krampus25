@@ -3,6 +3,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_color.h>
+#include <allegro5/allegro_primitives.h>
 #include <allegro5/utf8.h>
 #include "abort.h"
 #include <stdio.h>
@@ -143,14 +144,16 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	float x = s->xoffset + xflow; //TODO: take into account alignment flags...
 	float y = s->yoffset + yflow;
 
-
 	// TODO: line_num no longer needed, remove from callback?
 	al_draw_ustr(s->font, s->color, x, y, 0, line);
 
 	if (s->span->type == TextSpan::TYPE_LINK) {
+		float length = al_get_ustr_width(s->font, line);
+		al_draw_line(x, y + s->line_height - 2, x + length, y + s->line_height - 2, s->color, 1.0);
 		int line_width = al_get_ustr_width(s->font, line);
 		int line_height = s->line_height;
 		Rect linkRect(x, y, line_width, line_height);
+		// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
 		s->span->linkHotspots.push_back(linkRect);
 		// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
 	}
@@ -165,7 +168,7 @@ class DemoImpl: public Demo {
 	list<TextSpan> spans;
 
 	virtual void init() {
-		// ex.font = al_load_font("data/Caveat-VariableFont_wght.ttf", 16, 0);
+		// ex.font = al_load_font("data/Caveat-VariableFont_wght.ttf", 24, 0);
 		normal = al_load_font("data/DejaVuSans.ttf", 16, 0);
 		bold = al_load_font("data/DejaVuSans-Bold.ttf", 16, 0);
 		italic = al_load_font("data/DejaVuSans-Oblique.ttf", 16, 0);
