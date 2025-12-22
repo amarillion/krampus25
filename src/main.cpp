@@ -9,11 +9,13 @@ int main(int argc, const char *const *argv)
 	auto engine = make_shared<Engine>();
 
 	mainloop
+		.setFixedResolution(false)
+		.setUsagiMode()
 		.setEngine(engine)
 		.setTitle("P.E.N.G.U.I.N!")
 		.setAppName("PENGUIN");
 
-	mainloop.setPreferredGameResolution(800, 600);
+	mainloop.setPreferredDisplayResolution(800, 600);
 
 	mainloop.init(argc, argv);
 	engine->init();
