@@ -116,6 +116,7 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	std::string copy(al_cstr(line), al_ustr_size(line));
 
 	auto t = Text::build(s->color, 0, copy).font(s->font).xy(x, y).get();
+	t->setVisible(false); // Specifically for animated text...
 	s->components->push_back(t);
 
 	// if (s->span->type == TextSpan::TYPE_LINK) {

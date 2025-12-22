@@ -210,12 +210,7 @@ void TextCanvas::appendLine(const string &line)
 void TextCanvas::appendRich(const string &line) {
 	float xflow = xco; 
 	float yflow = yco;
-	auto i = lines.end();
 	appendRichText(line.c_str(), &xflow, &yflow, w, lines, style);
-	while (i != lines.end()) {
-		(*i)->setVisible(false);
-		i++;
-	}
 	xco = xflow;
 	yco = yflow;
 }
