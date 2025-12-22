@@ -27,6 +27,8 @@
 
 using namespace std;
 
+static const char * STORY_FILE = "data/STORY.txt";
+
 class Inventory : public Component {
 	map<string, ALLEGRO_BITMAP*> bmps;
 	SimpleState &sstate;
@@ -34,41 +36,14 @@ public:
 	Inventory(SimpleState &sstate) : sstate(sstate) {};
 	void init()
 	{
-		bmps["cap"] = Engine::getResources()->getBitmap("cap");
-
-		bmps["cher"] = Engine::getResources()->getBitmap("cher");
-		bmps["ramones"] = Engine::getResources()->getBitmap("ramones");
-
-		bmps["basketorganic"] = Engine::getResources()->getBitmap("organic");
-		bmps["basketnormal"] = Engine::getResources()->getBitmap("basket");
-
-		bmps["scarf"] = Engine::getResources()->getBitmap("scarf");
-		bmps["sunglasses"] = Engine::getResources()->getBitmap("sunglasses");
-		bmps["umbrella"] = Engine::getResources()->getBitmap("umbrella");
-
-		bmps["device"] = Engine::getResources()->getBitmap("device");
-
-		bmps["walletempty"] = Engine::getResources()->getBitmap("walletempty");
-		bmps["monez"] = Engine::getResources()->getBitmap("walletfull");
+		// bmps["cap"] = Engine::getResources()->getBitmap("cap");
 	}
 
 	virtual void draw(const GraphicsContext &gc) override
 	{
 		list<ALLEGRO_BITMAP*> toDraw;
 
-		if (sstate.gameVariables["monez"] == 0) toDraw.push_back(bmps["walletempty"]);
-
-		for (auto str : vector<string>{ "monez", "cap", "scarf", "sunglasses", "umbrella", "cher", "ramones"})
-		{
-			if (sstate.gameVariables[str] > 0)
-			{
-				toDraw.push_back(bmps[str]);
-			}
-		}
-
-		if (sstate.gameVariables["basket"] == 1 && sstate.gameVariables["organic"] == 0 ) toDraw.push_back(bmps["basketnormal"]);
-		if (sstate.gameVariables["basket"] == 1 && sstate.gameVariables["organic"] == 1 ) toDraw.push_back(bmps["basketorganic"]);
-		if (sstate.gameVariables["device"] == 1) toDraw.push_back(bmps["device"]);
+		// if (sstate.gameVariables["monez"] == 0) toDraw.push_back(bmps["walletempty"]);
 
 		int xco = getx();
 		int yco = gety();
@@ -140,21 +115,6 @@ public:
 
 	}
 
-	void startRain()
-	{
-		startLoop("ThunderStorm");
-	}
-
-	void startSqueak()
-	{
-		startLoop("BabyCrying");
-	}
-
-	void startWind()
-	{
-		startLoop("Wind");
-	}
-
 };
 
 class AnswerComponent : public Component {
@@ -224,7 +184,7 @@ private:
 		particles.setEffect(CLEAR);
 		squeak.clear();
 
-		parse("data/BUN.txt");
+		parse(STORY_FILE);
 	//	parse("example.txt");
 		setCurrentNode("START");
 
@@ -461,12 +421,7 @@ void GameImpl::executeSideEffect(Command *i)
 		//TODO: ignore repeated invocations of same effect...
 		if (activeEffect == i->parameter) { break; }
 		activeEffect = i->parameter;
-		if (i->parameter == "RAIN")
-		{
-			particles.setEffect(RAIN);
-			squeak.startRain();
-		}
-		else if (i->parameter == "SNOW")
+		if (i->parameter == "SNOW")
 		{
 			particles.setEffect(SNOW);
 			squeak.clear();
@@ -496,14 +451,10 @@ void GameImpl::executeSideEffect(Command *i)
 			particles.setEffect(CLEAR);
 			squeak.clear();
 		}
-		else if (i->parameter == "SQUEAK")
-		{
-			squeak.startSqueak();
-		}
 		else if (i->parameter == "WIND")
 		{
-			squeak.startWind();
 			particles.setEffect(WIND);
+			// squeak.startWind();
 		}
 		else if (i->parameter == "POW")
 		{
@@ -534,7 +485,7 @@ void GameImpl::executeSideEffect(Command *i)
 
 void GameImpl::refreshGame()
 {
-	parse("data/BUN.txt");
+	parse(STORY_FILE);
 	bool nodeValid = (story.nodes.find(sstate.currentNodeName) != story.nodes.end());
 	stringstream ss;
 	ss << "Could not return to same node '" << sstate.currentNodeName + "'";

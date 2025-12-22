@@ -10,8 +10,8 @@ int main(int argc, const char *const *argv)
 
 	mainloop
 		.setEngine(engine)
-		.setTitle("B.U.N!")
-		.setAppName("BUN");
+		.setTitle("P.E.N.G.U.I.N!")
+		.setAppName("PENGUIN");
 
 	mainloop.setPreferredGameResolution(800, 600);
 
