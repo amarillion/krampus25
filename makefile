@@ -10,7 +10,7 @@ NAME=krampus25
 
 TWIST_HOME=../twist5
 CCFLAGS = -std=c++20 -I$(TWIST_HOME)/include
-CFLAGS = -Iinclude -W -Wall -Wno-unused
+CFLAGS = -Iinclude -W -Wall -Wno-unused -DUSE_MOUSE
 LFLAGS =
 LIBS =
 
