@@ -8,6 +8,7 @@
 #include "color.h"
 #include "component.h"
 #include "widget.h"
+#include "richtext.h"
 
 struct ALLEGRO_FONT;
 struct ALLEGRO_SAMPLE;
@@ -31,6 +32,7 @@ private:
 	std::list<ComponentPtr>::iterator cursor;
 	ALLEGRO_COLOR activeColor; // color used for appending.
 	ALLEGRO_FONT *activeFont; // font used for appending
+	StyleData style;
 	int xco;
 	int yco;
 	int yoffset;
@@ -45,8 +47,10 @@ public:
 	void appendLine (const std::string &line);
 	void append (const std::string &line, ALLEGRO_COLOR color);
 	void appendImage (ALLEGRO_BITMAP *img);
+	void appendRich(const std::string &line);
 	void setActiveColor(ALLEGRO_COLOR color);
 	void setActiveFont(ALLEGRO_FONT *font) { assert (font != NULL); activeFont = font; }
+	void setStyle(const StyleData &style);
 	void clear();
 	virtual void handleMessage(ComponentPtr src, int msg) override;
 	virtual void draw(const GraphicsContext &gc) override;

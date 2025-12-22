@@ -249,7 +249,7 @@ public:
 	virtual void update() override;
 	virtual void draw(const GraphicsContext &gc) override;
 	virtual void handleEvent(ALLEGRO_EVENT &event) override;
-	virtual void init() override;
+	virtual void init(std::shared_ptr<Resources> res) override;
 	virtual ~GameImpl() {}
 	GameImpl();
 
@@ -386,7 +386,7 @@ void GameImpl::executeSideEffect(Command *i)
 		}
 		else
 		{
-			text.appendLine(i->parameter);
+			text.appendRich(i->parameter);
 		}
 		break;
 	case IMAGE: {
@@ -537,9 +537,22 @@ void GameImpl::parse(string fname)
 	gameAssert (parser->errorNum() == 0, parser->getErrors());
 }
 
-void GameImpl::init()
+void GameImpl::init(std::shared_ptr<Resources> res)
 {
 	text.setActiveFont(Engine::getFont());
+
+	StyleData style;
+	style.bold = res->getFont("DejaVuSans-Bold")->get(16);
+	style.normal = res->getFont("DejaVuSans")->get(16);
+	style.bold = res->getFont("DejaVuSans-Bold")->get(16);
+	style.italic = res->getFont("DejaVuSans-Oblique")->get(16);
+	style.header = res->getFont("DejaVuSans-Bold")->get(24);
+
+	style.textColor = al_color_name("white");
+	style.linkColor = al_color_name("blue");
+
+	text.setStyle(style);
+
 	squeak.init();
 	inventory.init();
 }

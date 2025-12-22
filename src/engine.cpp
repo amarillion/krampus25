@@ -27,7 +27,7 @@ void Engine::init()
 	setFont(font);
 
 	game = Game::newInstance();
-	game->init();
+	game->init(resources);
 	add(game, Container::FLAG_SLEEP);
 
 	initMenu();

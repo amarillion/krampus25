@@ -207,6 +207,19 @@ void TextCanvas::appendLine(const string &line)
 	append (line, activeColor);
 }
 
+void TextCanvas::appendRich(const string &line) {
+	float xflow = xco; 
+	float yflow = yco;
+	auto i = lines.end();
+	appendRichText(line.c_str(), &xflow, &yflow, w, lines, style);
+	while (i != lines.end()) {
+		(*i)->setVisible(false);
+		i++;
+	}
+	xco = xflow;
+	yco = yflow;
+}
+
 void TextCanvas::carriageReturn()
 {
 	xco = 0;
@@ -238,6 +251,10 @@ void TextCanvas::draw(const GraphicsContext &gc)
 			seg->kill(); // reclaim..
 		}
 	}
+}
+
+void TextCanvas::setStyle(const StyleData &_style) {
+	style = _style;
 }
 
 void ImageSegment::draw(const GraphicsContext &gc)

@@ -1,0 +1,44 @@
+--------------------------------------------------------------
+NODE START
+EFFECT CLEAR
+UNSET ALL
+
+Welcome to 
+<h1>P.E.N.G.U.I.N</h1>
+(Penguin's Extraordinary Narrative & Genuinely Unusual Interactive Novel).
+
+You are a biologist, you are looking for the rarest and most interesting specimens of mosses and lichens.
+Your quest has taken you all the way to Casey Research station on Antarctica.
+
+Your <b>goal</b> is to look around and find at least <b>three</b> different species of mosses and lichens.
+
+Each step of the way you will be presented with choices. 
+Press up / down to make a choice, then press Enter. You can also click or touch the option you want.
+
+ANSWER Press enter to continue... 
+GOTO START2
+--------------------------------------------------------------
+NODE START2
+
+In this game you can never lose. The worst that can happen is that you lose a few turns.
+There are no bad choices. Some choices won't make sense until later on. 
+Don't be afraid to try things out! 
+
+Ready? Let's get started.
+
+ANSWER Press enter to continue... 
+GOTO CREDITS
+
+--------------------------------------------------------------------
+NODE CREDITS
+
+EFFECT CONFETTI
+SAMPLE PartyHorn
+
+Thank you for playing!
+
+ANSWER Play again
+GOTO START
+
+ANSWER Exit
+END
