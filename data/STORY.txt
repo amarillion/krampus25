@@ -4,34 +4,47 @@ EFFECT CLEAR
 UNSET ALL
 
 Welcome to 
-<h1>P.E.N.G.U.I.N</h1>
-(Penguin's Extraordinary Narrative & Genuinely Unusual Interactive Novel).
 
-You are a biologist, you are looking for the rarest and most interesting specimens of mosses and lichens.
-Your quest has taken you all the way to Casey Research station on Antarctica.
-
-Your <b>goal</b> is to look around and find at least <b>three</b> different species of mosses and lichens.
+<h1>P.E.N.G.U.Ï.N</h1>
+(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel).
 
 Each step of the way you will be presented with choices. 
 Press up / down to make a choice, then press Enter. You can also click or touch the option you want.
-
-ANSWER Press enter to continue... 
-GOTO START2
---------------------------------------------------------------
-NODE START2
-
-In this game you can never lose. The worst that can happen is that you lose a few turns.
-There are no bad choices. Some choices won't make sense until later on. 
 Don't be afraid to try things out! 
 
 Ready? Let's get started.
 
 ANSWER Press enter to continue... 
+
+GOTO START3
+--------------------------------------------------------------------
+NODE START3
+
+You wake up, feeling rather cold.
+
+ANSWER Look around.
+GOTO START4
+--------------------------------------------------------------------
+NODE START4
+
+You see the inside of a small, sparse bedroom. There is a space heater running at full blast, barely making a dent in the cold.
+On the coat rack, there is thick coat, suitable for extremely cold weather.
+You are slowly starting to remember something...
+
+You are at <b>Casey Station in Antarctica</b>!
+
+Last night was a late party. You are part of a research crew, studying marine biology, climate, and gravitational waves. 
+Your specialism is botany, you study lichens, mosses and ferns. Your research has taken you all the way here, to <b>Antarctica</b>.
+
+ANSWER Get dressed and go leave the room.
 GOTO CREDITS
 --------------------------------------------------------------------
-NODE INSIDE
+NODE COMMON_ROOM
+
 --------------------------------------------------------------------
 NODE OUTDOOR
+Here is your boss, who happens to be a penguïn.
+
 --------------------------------------------------------------------
 NODE RESEARCH_DESK
 --------------------------------------------------------------------
