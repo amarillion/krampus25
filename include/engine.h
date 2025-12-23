@@ -3,9 +3,7 @@
 
 #include "game.h"
 #include "container.h"
-#include "menubase.h"
 #include "text2.h"
-#include "updatechecker.h"
 
 class Resources;
 
@@ -15,12 +13,8 @@ private:
 	static std::shared_ptr<Resources> resources;
 	static ALLEGRO_FONT *font;
 	static bool debugMode;
-	void initMenu();
-	MenuScreenPtr mPause;
-	MenuScreenPtr mMain;
-	std::shared_ptr<UpdateChecker> updates;
 public:
-	enum { E_NONE = 0, E_RESUME, E_QUIT, E_EXITSCREEN, E_LOAD, E_RESTART, E_TOGGLE_FULLSCREEN, E_EXIT_NOSAVE, E_PAUSE, E_ENDGAME };
+	enum { E_NONE = 0, E_START, E_QUIT };
 	std::shared_ptr<Game> game;
 
 	virtual void draw(const GraphicsContext &gc) {

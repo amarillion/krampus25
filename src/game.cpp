@@ -295,9 +295,9 @@ void GameImpl::handleEvent(ALLEGRO_EVENT &event)
 				saveGame();
 			}
 			break;
-		case ALLEGRO_KEY_ESCAPE:
-			pushMsg (Engine::E_PAUSE);
-			break;
+		// case ALLEGRO_KEY_ESCAPE:
+		// 	pushMsg (Engine::E_PAUSE);
+		// 	break;
 		}
 	}
 
@@ -343,7 +343,7 @@ void GameImpl::executeSideEffect(Command *i)
 	switch (i->commandType)
 	{
 	case END:
-		pushMsg (Engine::E_ENDGAME);
+		pushMsg (Engine::E_QUIT);
 //		i = end;
 		return;
 	case TEXT:
