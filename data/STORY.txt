@@ -1,3 +1,7 @@
+DEFINE schistidium
+DEFINE deschampsia
+DEFINE colobanthus
+
 --------------------------------------------------------------
 NODE START
 EFFECT CLEAR
@@ -16,7 +20,8 @@ Ready? Let's get started.
 
 ANSWER Press enter to continue... 
 
-GOTO START3
+# GOTO START3
+GOTO WEST
 --------------------------------------------------------------------
 NODE START3
 
@@ -74,9 +79,11 @@ GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE OUTDOOR
 
-You are standing on a central point between the various cabins that make up Casey Research station.
+You are standing on a central point between the various cabins that make up Casey Research station. 
+It's a nice bright December day in <i>south-hemisphere summer</i>.
 
-The coastline is towards the north. To the west is the entrance to the gravitational wave research station. The open plain is waiting for you towards the south. Your supervisor is waiting for you east.
+The coastline is towards the north. To the west is the entrance to the gravitational wave research station. 
+The open plain is waiting for you towards the south. Your supervisor is waiting for you east.
 
 ANSWER North
 GOTO NORTH
@@ -95,29 +102,88 @@ NODE EAST
 
 Here is your supervisor, who happens to be a <i>penguïn</i>.
 
-She says:
+IMAGE king_penguin
 
-"Had a good party? Let's get back to work. I want you to start collecting specimens of moss today."
+GOTO EAST_CTD
+--------------------------------------------------------------------
+NODE EAST_CTD
+
+IF schistidium AND deschampsia AND colobanthus
+
+Your supervisor is elated. That's awesome! You collected all three species!
+
+GOTO CREDITS 
+
+ENDIF
+
+Your supervisor says:
+
+"Had a good party? Let's get to work. I want you to start collecting specimens of moss today."
+
+ANSWER Ask: "Which types of mosses should I look for?"
+GOTO INSTRUCTIONS
+
+ANSWER Ask: "What makes these mosses interesting?"
+GOTO WHY
+
+ANSWER Leave and get to work
+
+"See you soon!"
+
+GOTO OUTDOOR
+--------------------------------------------------------------------
+NODE WHY
 
 Moss is changing rapidly due to climate change. In fact, it is not doing so well with the changing conditions.
 We want to understand how we can protect this vulnerable ecosystem.
 
-She asks you to find samples of three species:
+GOTO EAST_CTD
+--------------------------------------------------------------------
+NODE INSTRUCTIONS
 
-1. Antarctic pearlwort (<i>Colobanthus quitensis</i>) 
+IF NOT (schistidium AND deschampsia AND colobanthus)
+She wants you to collect the following species:
+ENDIF
 
-2. Antarctic hair grass (<i>Deschampsia antarctica</i>)
+IF NOT colobanthus
+- Antarctic pearlwort (<i>Colobanthus quitensis</i>) 
+ENDIF
 
-3. Antarctic moss (<i>Schistidium antarctici</i>)
+IF NOT deschampsia
+- Antarctic hair grass (<i>Deschampsia antarctica</i>)
+ENDIF
 
-ANSWER Go back
-GOTO OUTDOOR
+IF NOT schistidium
+- Antarctic moss (<i>Schistidium antarctici</i>)
+ENDIF
+
+IF schistidium OR deschampsia OR colobanthus
+You have already collected:
+ENDIF
+
+IF colobanthus 
+- Antarctic pearlwort (<i>Colobanthus quitensis</i>) 
+ENDIF
+
+IF deschampsia
+- Antarctic hair grass (<i>Deschampsia antarctica</i>)
+ENDIF
+
+IF schistidium
+Antarctic moss (<i>Schistidium antarctici</i>)
+ENDIF
+
+GOTO EAST_CTD
 --------------------------------------------------------------------
 NODE SOUTH
 
 Open plain
 
 Patrick Pannekoek is here.
+
+IMAGE Colobanthus_quitensis
+
+SET colobanthus
 
 ANSWER Go back
 GOTO OUTDOOR
@@ -126,15 +192,45 @@ NODE NORTH
 
 Coastline
 
+IMAGE Schistidium_antarctici
+
+SET schistidium
+
 ANSWER Go back
 GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE WEST
 
-Gravitational research station
+You are in the cabin that houses the control room of the nearby gravitational wave sensor. 
+This room is full of highly sensitive computer equipment. There is a paper note stuck to one of the monitors.
+
+Ben is the technician on duty. He is manning one of the terminals, typing away at the keyboard.
+
+ANSWER Read note
+
+The note reads: 
+
+<b>ACHTUNG!</b>
+
+<b></b>ALLES TURISTEN UND NONTEKNISCHEN LOOKENSPEEPERS! DAS KOMPUTERMASCHINE IST NICHT FÜR DER GEFINGERPOKEN UND MITTENGRABEN! ODERWISE IST EASY TO SCHNAPPEN DER SPRINGENWERK, BLOWENFUSEN UND POPPENCORKEN MIT SPITZENSPARKEN. IST NICHT FÜR GEWERKEN BEI DUMMKOPFEN. DER RUBBERNECKEN SIGHTSEEREN KEEPEN DAS COTTONPICKEN HÄNDER IN DAS POCKETS MUSS.
+
+<b></b>ZO RELAXEN UND <b>WATSCHEN DER BLINKENLICHTEN</b>.
+
+ANSWER Ask Ben if you can use the computer.
+
+"No way José. This is machine controls the gravitational wave sensor. Any interruption in the data transfer between the sensor and the control systems could cause massive unforeseen consequences. 
+
+He adds: Especially do not touch the <b>time zone settings</b>. I'm serious! This has caused so much trouble in the past!"
 
 ANSWER Go back
 GOTO OUTDOOR
+--------------------------------------------------------------------
+NODE UNKNOWN
+
+IMAGE Deschampsia_antarctica
+
+SET deschampsia
+
 --------------------------------------------------------------------
 NODE PAST
 --------------------------------------------------------------------
