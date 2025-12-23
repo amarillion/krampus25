@@ -1,6 +1,11 @@
 DEFINE schistidium
 DEFINE deschampsia
 DEFINE colobanthus
+DEFINE compass
+DEFINE bay_visited
+DEFINE ben_visited
+DEFINE ben_away
+DEFINE past
 
 --------------------------------------------------------------
 NODE START
@@ -20,8 +25,7 @@ Ready? Let's get started.
 
 ANSWER Press enter to continue... 
 
-# GOTO START3
-GOTO WEST
+GOTO START3
 --------------------------------------------------------------------
 NODE START3
 
@@ -47,7 +51,7 @@ GOTO COMMON_ROOM
 NODE COMMON_ROOM
 
 The sleeping quarters connect via a hallway to a common room. Several of your colleagues are here,
-Preparing breakfast, and doing some post-party clean-up.
+preparing breakfast, and doing some post-party clean-up.
 
 Your colleague says: "Hurry! Your supervisor is waiting for you outside!"
 
@@ -55,7 +59,7 @@ ANSWER Have some breakfast first.
 GOTO BREAKFAST
 
 ANSWER Hurry and go outside.
-GOTO OUTDOOR
+GOTO CENTER
 --------------------------------------------------------------------
 NODE BREAKFAST
 
@@ -75,15 +79,26 @@ You all have a good laugh at that.
 
 ANSWER No more procrastination, go see your supervisor ourside.
 
-GOTO OUTDOOR
+GOTO CENTER
 --------------------------------------------------------------------
-NODE OUTDOOR
+NODE CENTER
 
 You are standing on a central point between the various cabins that make up Casey Research station. 
 It's a nice bright December day in <i>south-hemisphere summer</i>.
 
+IF past
+There is something growing in the fresh snow.
+ELSE
+The snow is trodden down, if antyhing was growing here, then it's well squished by now.
+ENDIF
+
 The coastline is towards the north. To the west is the entrance to the gravitational wave research station. 
 The open plain is waiting for you towards the south. Your supervisor is waiting for you east.
+
+IF past AND NOT deschampsia
+ANSWER Look down in the fresh snow
+GOTO FRESH_SNOW
+ENDIF
 
 ANSWER North
 GOTO NORTH
@@ -97,6 +112,17 @@ GOTO SOUTH
 ANSWER West
 GOTO WEST
 
+--------------------------------------------------------------------
+NODE FRESH_SNOW
+
+IMAGE Deschampsia_antarctica
+
+SET deschampsia
+
+Well spotted! There is a useful sample of <i>Deschampsia antarctica</i> growing here. You pick some up for your supervisor.
+
+ANSWER Continue...
+GOTO CENTER
 --------------------------------------------------------------------
 NODE EAST
 
@@ -126,11 +152,11 @@ GOTO INSTRUCTIONS
 ANSWER Ask: "What makes these mosses interesting?"
 GOTO WHY
 
-ANSWER Leave and get to work
+ANSWER Leave and get to work.
 
 "See you soon!"
 
-GOTO OUTDOOR
+GOTO CENTER
 --------------------------------------------------------------------
 NODE WHY
 
@@ -179,32 +205,67 @@ NODE SOUTH
 
 Open plain
 
-Patrick Pannekoek is here.
+Patrick Pannekoek is here, observing the 24 hour sun.
+
+IF past
 
 IMAGE Colobanthus_quitensis
 
 SET colobanthus
 
-ANSWER Go back
-GOTO OUTDOOR
+ENDIF
+
+### TODO ###
+
+You pick up the dropped compass
+
+SET compass
+
+ANSWER Go back to the central point
+GOTO CENTER
 --------------------------------------------------------------------
 NODE NORTH
 
-Coastline
+You're on the coastline overlooking Newcomb Bay.
+
+IF NOT past
+
+In the distance you see some nice mosses. Unfortunately, the high tide is running up against a steep icy cliff, blocking
+the path towards the mossy glade. If only you had gotten up a <b>few hours earlier</b> you would have been able to pick up your moss samples, no problem.
+
+SET bay_visited
+
+ELSE
+
+In the lower tide, you can reach the mosses. Look at that!
 
 IMAGE Schistidium_antarctici
-
 SET schistidium
 
-ANSWER Go back
-GOTO OUTDOOR
+You collect a sample for your supervisor.
+
+ENDIF
+
+ANSWER Return to the central point.
+GOTO CENTER
+
 --------------------------------------------------------------------
 NODE WEST
+
+IF compass AND ben_visited AND bay_visited
+SET ben_away
+ENDIF
+
+SET ben_visited
 
 You are in the cabin that houses the control room of the nearby gravitational wave sensor. 
 This room is full of highly sensitive computer equipment. There is a paper note stuck to one of the monitors.
 
+IF ben_away
+Ben is not here. He must have gone to the bathroom or something
+ELSE
 Ben is the technician on duty. He is manning one of the terminals, typing away at the keyboard.
+ENDIF
 
 ANSWER Read note
 
@@ -216,23 +277,74 @@ The note reads:
 
 <b></b>ZO RELAXEN UND <b>WATSCHEN DER BLINKENLICHTEN</b>.
 
+GOTO WEST
+IF ben_away
+ANSWER Sit at the vacated computer terminal.
+GOTO TERMINAL
+ELSE
 ANSWER Ask Ben if you can use the computer.
 
 "No way José. This is machine controls the gravitational wave sensor. Any interruption in the data transfer between the sensor and the control systems could cause massive unforeseen consequences. 
 
 He adds: Especially do not touch the <b>time zone settings</b>. I'm serious! This has caused so much trouble in the past!"
 
-ANSWER Go back
-GOTO OUTDOOR
+GOTO WEST
+ENDIF
+ANSWER Go back to the central point.
+GOTO CENTER
 --------------------------------------------------------------------
-NODE UNKNOWN
+NODE TERMINAL
 
-IMAGE Deschampsia_antarctica
+You are sitting at the control station. The computer menu gives you a few options. 
 
-SET deschampsia
 
+ANSWER Check Status
+
+It looks like Ben was running some kind experiment involving magnetic monopoles and microscopic black holes.
+Highly technical stuff.
+
+You notice something odd though. The clock showing on the computer is <b>off by three hours</b> compared to the clock on the wall. What's up with that?
+
+ANSWER Run Level Three Diagnostic.
+
+After 10 minute wait, the computer comes up with zero results. Perhaps you need to run a Level Four Diagnostic next time.
+
+ANSWER Check weather
+
+We are currently undergoing a tachyon storm.
+
+ANSWER Update time zone database.
+
+Oh no, what have you done...
+
+GOTO TO_THE_PAST
+
+ANSWER Step away from the computer.
+
+You're right, this is complicated stuff. Better not touch anything before something weird happens...
+
+GOTO WEST
+--------------------------------------------------------------------
+NODE TO_THE_PAST
+
+For administrative reasons, casey research station shifted from UTC+8 to UTC+11. 
+By updating the time zone database on a live data connection, you started a complex chain of events, evolving a tachyon storm,
+magnetic monopoles and microscopic black holes.
+
+The upshot is, that you are catapulted <b>three hours into the past</b>!
+
+ANSWER Continue...
+GOTO PAST
 --------------------------------------------------------------------
 NODE PAST
+
+SET past
+
+You are back at the gravitational control room. Checking the clock on the wall, you see that it is now early morning, three hours earlier than you left.
+
+Your supervisor, Ben, and all the others are probably still in their bed at this time.
+
+GOTO CENTER
 --------------------------------------------------------------------
 NODE FLAT_EARTH_PAST
 --------------------------------------------------------------------
