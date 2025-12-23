@@ -29,37 +29,6 @@ using namespace std;
 
 static const char * STORY_FILE = "data/STORY.txt";
 
-class Inventory : public Component {
-	map<string, ALLEGRO_BITMAP*> bmps;
-	SimpleState &sstate;
-public:
-	Inventory(SimpleState &sstate) : sstate(sstate) {};
-	void init()
-	{
-		// bmps["cap"] = Engine::getResources()->getBitmap("cap");
-	}
-
-	virtual void draw(const GraphicsContext &gc) override
-	{
-		list<ALLEGRO_BITMAP*> toDraw;
-
-		// if (sstate.gameVariables["monez"] == 0) toDraw.push_back(bmps["walletempty"]);
-
-		int xco = getx();
-		int yco = gety();
-		draw_text_with_background(Engine::getFont(), WHITE, GREY, xco, yco, ALLEGRO_ALIGN_LEFT, "INVENTORY");
-
-		yco += 32;
-
-		for (ALLEGRO_BITMAP *bmp : toDraw)
-		{
-			al_draw_bitmap(bmp, xco, yco, 0);
-			yco += 48;
-		}
-	}
-
-};
-
 class Squeak
 {
 public:
@@ -137,7 +106,6 @@ private:
 	vector<AnswerComponent>::iterator selectedAnswer;
 	vector<AnswerComponent> currentAnswers;
 	SimpleState sstate;
-	Inventory inventory;
 	unique_ptr<Interpreter> interpreter;
 	Node *getCurrentNode() { return &(story.nodes[sstate.currentNodeName]); }
 	void parse(string fname);
@@ -274,11 +242,10 @@ void GameImpl::gameAssert(bool test, const string &value)
 	if (!test) text.append("ERROR: " + value + "\n", RED);
 }
 
-GameImpl::GameImpl() : activeEffect("clear"), state(PAUSE), sstate(), inventory(sstate)
+GameImpl::GameImpl() : activeEffect("clear"), state(PAUSE), sstate()
 {
 	// layout
-	text.setLocation(80, 80, 540, 200);
-	inventory.setLocation(680, 80, 100, 480);
+	text.setLocation(80, 80, MAIN_WIDTH-160, 200);
 	particles.setLocation(0, 0, MAIN_WIDTH, MAIN_HEIGHT);
 }
 
@@ -380,9 +347,10 @@ void GameImpl::executeSideEffect(Command *i)
 //		i = end;
 		return;
 	case TEXT:
+		// Empty line means paragraph break.
 		if (i->parameter == "")
 		{
-			text.appendLine("\n"); // paragraph break
+			text.appendLine("\n\n"); // paragraph break
 		}
 		else
 		{
@@ -508,7 +476,6 @@ void GameImpl::draw(const GraphicsContext &gc)
 	}
 	particles.draw(gc);
 	text.draw(gc);
-	inventory.draw(gc);
 
 	if (state == ANSWERING)
 	{
@@ -554,7 +521,6 @@ void GameImpl::init(std::shared_ptr<Resources> res)
 	text.setStyle(style);
 
 	squeak.init();
-	inventory.init();
 }
 
 
