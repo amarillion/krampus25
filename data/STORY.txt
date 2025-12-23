@@ -6,7 +6,7 @@ UNSET ALL
 Welcome to 
 
 <h1>P.E.N.G.U.Ï.N</h1>
-(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel).
+<i>(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel)</i>.
 
 Each step of the way you will be presented with choices. 
 Press up / down to make a choice, then press Enter. You can also click or touch the option you want.
@@ -33,28 +33,108 @@ You are slowly starting to remember something...
 
 You are at <b>Casey Station in Antarctica</b>!
 
-Last night was a late party. You are part of a research crew, studying marine biology, climate, and gravitational waves. 
+Last night was a christmas party. You are part of a research crew, studying marine biology, climate, and gravitational waves. 
 Your specialism is botany, you study lichens, mosses and ferns. Your research has taken you all the way here, to <b>Antarctica</b>.
 
 ANSWER Get dressed and go leave the room.
-GOTO CREDITS
+GOTO COMMON_ROOM
 --------------------------------------------------------------------
 NODE COMMON_ROOM
 
+The sleeping quarters connect via a hallway to a common room. Several of your colleagues are here,
+Preparing breakfast, and doing some post-party clean-up.
+
+Your colleague says: "Hurry! Your supervisor is waiting for you outside!"
+
+ANSWER Have some breakfast first.
+GOTO BREAKFAST
+
+ANSWER Hurry and go outside.
+GOTO OUTDOOR
+--------------------------------------------------------------------
+NODE BREAKFAST
+
+During breakfast, you listen in on a conversation.
+
+"Do you know who arrived on yesterday's ship?"
+
+"No?"
+
+"It's, Patrick Pannekoek, the famous <i>Youtube influencer</i> and <i>flat earth conspiracy theorist</i>"
+
+"Oh, a fringe pseudoscientist like that, he can't have many followers, can he?"
+
+"He has many! In fact he has followers from all around the globe!"
+
+You all have a good laugh at that.
+
+ANSWER No more procrastination, go see your supervisor ourside.
+
+GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE OUTDOOR
-Here is your boss, who happens to be a penguïn.
+
+You are standing on a central point between the various cabins that make up Casey Research station.
+
+The coastline is towards the north. To the west is the entrance to the gravitational wave research station. The open plain is waiting for you towards the south. Your supervisor is waiting for you east.
+
+ANSWER North
+GOTO NORTH
+
+ANSWER East
+GOTO EAST
+
+ANSWER South
+GOTO SOUTH
+
+ANSWER West
+GOTO WEST
 
 --------------------------------------------------------------------
-NODE RESEARCH_DESK
+NODE EAST
+
+Here is your supervisor, who happens to be a <i>penguïn</i>.
+
+She says:
+
+"Had a good party? Let's get back to work. I want you to start collecting specimens of moss today."
+
+Moss is changing rapidly due to climate change. In fact, it is not doing so well with the changing conditions.
+We want to understand how we can protect this vulnerable ecosystem.
+
+She asks you to find samples of three species:
+
+1. Antarctic pearlwort (<i>Colobanthus quitensis</i>) 
+
+2. Antarctic hair grass (<i>Deschampsia antarctica</i>)
+
+3. Antarctic moss (<i>Schistidium antarctici</i>)
+
+ANSWER Go back
+GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE SOUTH
+
+Open plain
+
+Patrick Pannekoek is here.
+
+ANSWER Go back
+GOTO OUTDOOR
 --------------------------------------------------------------------
-NODE EAST
+NODE NORTH
+
+Coastline
+
+ANSWER Go back
+GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE WEST
---------------------------------------------------------------------
-NODE FLAT_EARTH_CONVO
+
+Gravitational research station
+
+ANSWER Go back
+GOTO OUTDOOR
 --------------------------------------------------------------------
 NODE PAST
 --------------------------------------------------------------------
