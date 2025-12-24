@@ -116,19 +116,15 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	std::string copy(al_cstr(line), al_ustr_size(line));
 
 	auto t = Text::build(s->color, 0, copy).font(s->font).xy(x, y).get();
+
+	if (s->span->type == TextSpan::TYPE_LINK) {
+		t->setDecoration(TextStyle::UNDERLINE);
+		//TODO: copy href.
+	}
+
 	t->setVisible(false); // Specifically for animated text...
 	s->components->push_back(t);
 
-	// if (s->span->type == TextSpan::TYPE_LINK) {
-	// 	float length = al_get_ustr_width(s->font, line);
-	// 	al_draw_line(x, y + s->line_height - 2, x + length, y + s->line_height - 2, s->color, 1.0);
-	// 	int line_width = al_get_ustr_width(s->font, line);
-	// 	int line_height = s->line_height;
-	// 	Rect linkRect(x, y, line_width, line_height);
-	// 	// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
-	// 	s->span->linkHotspots.push_back(linkRect);
-	// 	// al_draw_rectangle(x, y, x + line_width, y + line_height, al_color_name("red"), 1.0);
-	// }
 	return true;
 }
 
