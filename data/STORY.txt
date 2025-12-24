@@ -31,7 +31,7 @@ GOTO START3
 --------------------------------------------------------------------
 NODE START3
 
-You wake up, feeling rather cold.
+You wake up, feeling hung over and rather cold.
 
 ANSWER Look around.
 GOTO START4
@@ -40,7 +40,7 @@ NODE START4
 
 You see the inside of a small, sparse bedroom. There is a space heater running at full blast, barely making a dent in the cold.
 On the coat rack, there is thick coat, suitable for extremely cold weather.
-You are slowly starting to remember something...
+Your headache clears up a bit. You are slowly starting to remember something...
 
 You are at <a href="https://www.antarctica.gov.au/antarctic-operations/stations-and-field-locations/casey/">Casey Station in Antarctica</a>!
 
@@ -129,14 +129,19 @@ GOTO CENTER
 --------------------------------------------------------------------
 NODE EAST
 
-Here is your supervisor, who happens to be a <i>penguïn</i>.
-
-IMAGE king_penguin
-
 IF schistidium AND deschampsia AND colobanthus
 Your supervisor is elated. That's awesome! You collected all three species!
 GOTO CREDITS 
+ELSE
+GOTO EAST0
 ENDIF
+
+--------------------------------------------------------------------
+NODE EAST0
+
+Here is your supervisor, who happens to be a <i>penguïn</i>.
+
+IMAGE king_penguin
 
 GOTO EAST_CTD
 --------------------------------------------------------------------
@@ -205,7 +210,11 @@ NODE SOUTH
 
 IF patrick_left
 GOTO SOUTH3
+ELSE
+GOTO SOUTH0
 ENDIF
+--------------------------------------------------------------------
+NODE SOUTH0
 
 You are on an open plain on the antarctic ice sheet. The famous influencer Patrick Pannekoek is here. He seems rather distressed.
 He's standing in front of a beautiful sample of <i>Colobanthus quitensis</i>! 
@@ -257,7 +266,7 @@ ENDIF
 NODE SOUTH2
 
 Patrick's face turns ashen. You're right, he says. Because I lost sight of my compass, even for a short while, it could have been swapped. 
-I can no longer trust it. I can no longer know for certain if I'm really on the South Pole!. My mission is a failure!
+I can no longer trust it. I can no longer know for certain if I'm really on the South Pole! My mission is a failure!
 
 With a scream of frustration, he runs back to the base, never to be seen again.
 
@@ -278,11 +287,11 @@ IMAGE Colobanthus_quitensis
 SET colobanthus
 
 You pick up a nice sample of <i>Colobanthus quitensis</i>
+
 ENDIF
 
 ANSWER Go back to the central point
 GOTO CENTER
-
 --------------------------------------------------------------------
 NODE NORTH
 
@@ -399,7 +408,7 @@ That was all rather complicated however, and nowadays they just stick to UTC+8 a
 
 The computer was still running on an outdated time zone database, so it was running on UTC+11.
 
-By updating the time zone database on a live data connection, you started a complex chain of events, evolving a tachyon storm,
+By updating the time zone database on a live data connection, you started a complex chain of events, involving a tachyon storm,
 magnetic monopoles and microscopic black holes. The upshot is, that you are catapulted <b>three hours into the past!</b>
 
 ANSWER Continue...
