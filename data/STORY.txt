@@ -1,7 +1,9 @@
 DEFINE schistidium
 DEFINE deschampsia
 DEFINE colobanthus
-DEFINE compass
+DEFINE compass_given
+DEFINE compass_suspected
+DEFINE patrick_left
 DEFINE bay_visited
 DEFINE ben_visited
 DEFINE ben_away
@@ -18,7 +20,7 @@ Welcome to
 <i>(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel)</i>.
 
 Each step of the way you will be presented with choices. 
-Press up / down to make a choice, then press Enter. You can also click or touch the option you want.
+Press up / down to make a choice, then press Enter.
 Don't be afraid to try things out! 
 
 Ready? Let's get started.
@@ -40,7 +42,7 @@ You see the inside of a small, sparse bedroom. There is a space heater running a
 On the coat rack, there is thick coat, suitable for extremely cold weather.
 You are slowly starting to remember something...
 
-You are at <b>Casey Station in Antarctica</b>!
+You are at <a href="https://www.antarctica.gov.au/antarctic-operations/stations-and-field-locations/casey/">Casey Station in Antarctica</a>!
 
 Last night was a christmas party. You are part of a research crew, studying marine biology, climate, and gravitational waves. 
 Your specialism is botany, you study lichens, mosses and ferns. Your research has taken you all the way here, to <b>Antarctica</b>.
@@ -65,7 +67,7 @@ NODE BREAKFAST
 
 During breakfast, you listen in on a conversation.
 
-"Do you know who arrived on yesterday's ship?"
+"Do you know who arrived on yesterday's over-snow bus?"
 
 "No?"
 
@@ -86,10 +88,11 @@ NODE CENTER
 You are standing on a central point between the various cabins that make up Casey Research station. 
 It's a nice bright December day in <i>south-hemisphere summer</i>.
 
-IF past
+IF past AND NOT deschampsia
 There is something growing in the fresh snow.
-ELSE
-The snow is trodden down, if antyhing was growing here, then it's well squished by now.
+ENDIF
+IF NOT past
+The snow is trodden down, if antyhing <b>was growing here</b>, then it's well squished by now.
 ENDIF
 
 The coastline is towards the north. To the west is the entrance to the gravitational wave research station. 
@@ -130,17 +133,14 @@ Here is your supervisor, who happens to be a <i>penguïn</i>.
 
 IMAGE king_penguin
 
+IF schistidium AND deschampsia AND colobanthus
+Your supervisor is elated. That's awesome! You collected all three species!
+GOTO CREDITS 
+ENDIF
+
 GOTO EAST_CTD
 --------------------------------------------------------------------
 NODE EAST_CTD
-
-IF schistidium AND deschampsia AND colobanthus
-
-Your supervisor is elated. That's awesome! You collected all three species!
-
-GOTO CREDITS 
-
-ENDIF
 
 Your supervisor says:
 
@@ -203,26 +203,86 @@ GOTO EAST_CTD
 --------------------------------------------------------------------
 NODE SOUTH
 
-Open plain
-
-Patrick Pannekoek is here, observing the 24 hour sun.
-
-IF past
-
-IMAGE Colobanthus_quitensis
-
-SET colobanthus
-
+IF patrick_left
+GOTO SOUTH3
 ENDIF
 
-### TODO ###
+You are on an open plain on the antarctic ice sheet. The famous influencer Patrick Pannekoek is here. He seems rather distressed.
+He's standing in front of a beautiful sample of <i>Colobanthus quitensis</i>! 
+But he's blocking the safe path, and you don't want to risk stepping into a crevice.
 
-You pick up the dropped compass
+ANSWER Ask: Why are you here?
 
-SET compass
+He tells you that he is here to observe the 24-hour sun for the <a href="https://en.wikipedia.org/wiki/The_Final_Experiment_(expedition)">final experiment</a>. 
+
+GOTO SOUTH
+ANSWER Ask him about the final experiment.
+
+The globalist conspiracy will tell you that the Sun is visible for 24 hours in <a href="https://www.timeanddate.com/sun/antarctica/casey?month=12&year=2025">December in Antarctica</a>.
+This is obviously false, because the earth is flat as a pancake and the south pole is actually an ice wall on the outer rim. I need my compass to confirm I am really on the South Pole.
+
+GOTO SOUTH
+IF NOT compass_given
+ANSWER Ask: Could you please step aside so I can collect some moss?
+
+First I need to find my compass. I'm sorry, I can't let you distract me from my important mission.
+
+Suddenly, a stranger walks up. You can't quite make out his face. But his voice seems familiar. 
+He says: "Were you looking for this?" and hands him a compass.
+
+Patrick accepts with a yelp! "Thank you so much!".
+
+After the consternation has passed, you no longer see the stranger. He disappeared.
+
+SET compass_given
+GOTO SOUTH
+ENDIF
+
+IF compass_given AND NOT compass_suspected
+
+ANSWER Ask: Why is this compass so important?
+
+With this trusty compass, I can make sure that I'm always heading south. Just to make sure the NASA global conspiracy 
+doesn't get a chance to mislead me and place me on the North pole instead. I'm watching the compass needle like a hawk!
+
+SET compass_suspected
+GOTO SOUTH
+ENDIF
+IF compass_suspected
+ANSWER Ask: How can you be sure your compass wasn't tampered with?
+
+GOTO SOUTH2
+ENDIF
+--------------------------------------------------------------------
+NODE SOUTH2
+
+Patrick's face turns ashen. You're right, he says. Because I lost sight of my compass, even for a short while, it could have been swapped. 
+I can no longer trust it. I can no longer know for certain if I'm really on the South Pole!. My mission is a failure!
+
+With a scream of frustration, he runs back to the base, never to be seen again.
+
+SET patrick_left
+
+ANSWER Continue...
+GOTO SOUTH3
+--------------------------------------------------------------------
+NODE SOUTH3
+
+You are on an open plain on the antarctic ice sheet. 
+
+Patrick, the flat earth youtuber, has left.
+
+IF NOT colobanthus
+
+IMAGE Colobanthus_quitensis
+SET colobanthus
+
+You pick up a nice sample of <i>Colobanthus quitensis</i>
+ENDIF
 
 ANSWER Go back to the central point
 GOTO CENTER
+
 --------------------------------------------------------------------
 NODE NORTH
 
@@ -252,7 +312,7 @@ GOTO CENTER
 --------------------------------------------------------------------
 NODE WEST
 
-IF compass AND ben_visited AND bay_visited
+IF compass_given AND ben_visited AND bay_visited
 SET ben_away
 ENDIF
 
@@ -287,6 +347,13 @@ ANSWER Ask Ben if you can use the computer.
 "No way José. This is machine controls the gravitational wave sensor. Any interruption in the data transfer between the sensor and the control systems could cause massive unforeseen consequences. 
 
 He adds: Especially do not touch the <b>time zone settings</b>. I'm serious! This has caused so much trouble in the past!"
+
+GOTO WEST
+ANSWER Ask Ben if he's always here.
+
+I'm here all the time. Well, except when I need to go to the bathroom, or when I have to get some coffee and snacks from the common room.
+
+Why do you ask?
 
 GOTO WEST
 ENDIF
@@ -327,11 +394,13 @@ GOTO WEST
 --------------------------------------------------------------------
 NODE TO_THE_PAST
 
-For administrative reasons, casey research station shifted from UTC+8 to UTC+11. 
-By updating the time zone database on a live data connection, you started a complex chain of events, evolving a tachyon storm,
-magnetic monopoles and microscopic black holes.
+In the past, Casey Station <a href="https://www.timeanddate.com/time/zone/antarctica/casey">changed between UTC+8 in the winter season and UTC+11 in the summer</a>, lining up with the time zone in Hobart, Australia.
+That was all rather complicated however, and nowadays they just stick to UTC+8 all year around.
 
-The upshot is, that you are catapulted <b>three hours into the past</b>!
+The computer was still running on an outdated time zone database, so it was running on UTC+11.
+
+By updating the time zone database on a live data connection, you started a complex chain of events, evolving a tachyon storm,
+magnetic monopoles and microscopic black holes. The upshot is, that you are catapulted <b>three hours into the past!</b>
 
 ANSWER Continue...
 GOTO PAST
@@ -342,7 +411,7 @@ SET past
 
 You are back at the gravitational control room. Checking the clock on the wall, you see that it is now early morning, three hours earlier than you left.
 
-Your supervisor, Ben, and all the others are probably still in their bed at this time.
+Many of the researchers are probably still in their bed at this time.
 
 GOTO CENTER
 --------------------------------------------------------------------
@@ -351,7 +420,6 @@ NODE FLAT_EARTH_PAST
 NODE CREDITS
 
 EFFECT CONFETTI
-SAMPLE PartyHorn
 
 Thank you for playing!
 
