@@ -245,7 +245,7 @@ void GameImpl::gameAssert(bool test, const string &value)
 GameImpl::GameImpl() : activeEffect("clear"), state(PAUSE), sstate()
 {
 	// layout
-	text.setLocation(80, 80, MAIN_WIDTH-160, 200);
+	text.setLocation(80, 80, MAIN_WIDTH-160, 320);
 	particles.setLocation(0, 0, MAIN_WIDTH, MAIN_HEIGHT);
 }
 
@@ -534,7 +534,7 @@ void GameImpl::executeCommands(vector<Command> commands)
 	interpreter->executeStatements(sstate, answerResult, i, commands.end());
 
 	int xco = 100;
-	int yco = 400;
+	int yco = 560;
 	bool first = true;
 	for (Answer a : answerResult)
 	{
