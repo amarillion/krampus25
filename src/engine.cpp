@@ -1,6 +1,5 @@
 #include "engine.h"
 #include "util.h"
-#include "mainloop.h"
 #include "menubase.h"
 #include "DrawStrategy.h"
 #include "parser.h"
@@ -12,8 +11,7 @@ bool Engine::debugMode = false;
 
 using namespace std;
 
-void Engine::init()
-{
+void Engine::init() {
 	resources = Resources::newInstance();
 
 	resources->addDir("data");
@@ -24,23 +22,22 @@ void Engine::init()
 		exit(1);
 	}
 
-	setFont(font);
-
 	game = Game::newInstance();
 	game->init(resources);
-	add(game, Container::FLAG_SLEEP);
 
 	ALLEGRO_PATH *localAppData = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH);
 	string cacheDir = al_path_cstr(localAppData, ALLEGRO_NATIVE_PATH_SEP);
 
 	game->initGame();
- 	setFocus(game);
 }
 
-Engine::~Engine() {}
+Engine::~Engine() {
+	// make sure resources are cleared before allegro is uninstalled.
+	// otherwise resources will be cleared twice
+	resources = nullptr;
+}
 
-void Engine::handleEvent(ALLEGRO_EVENT &event)
-{
+void Engine::handleEvent(ALLEGRO_EVENT &event) {
 	//TODO: implement F11 as a child of mainloop that send action events on press
 #ifdef DEBUG
 	if (event.type == ALLEGRO_EVENT_KEY_CHAR &&
@@ -50,11 +47,19 @@ void Engine::handleEvent(ALLEGRO_EVENT &event)
 		return; // consume event
 	}
 #endif
-	Container::handleEvent(event);
+	game->handleEvent(event);
 }
 
+bool Engine::update() {
+	bool result = true;
+	game->update();
+	while(game->hasMsg()) {
+		int msg = game->popMsg();
+		printf("On Handle Message called %i", msg);
 
-bool Engine::onHandleMessage(ComponentPtr src, int event)
-{
-	return true;
+		if (msg == Engine::E_QUIT) {
+			result = false;
+		}
+	}
+	return result;
 }

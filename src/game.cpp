@@ -22,7 +22,6 @@
 #include "text2.h"
 #include "parser.h"
 #include "textstyle.h"
-#include "mainloop.h"
 #include "resources.h"
 
 using namespace std;
