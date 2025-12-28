@@ -32,8 +32,7 @@ void Engine::init() {
 }
 
 Engine::~Engine() {
-	// make sure resources are cleared before allegro is uninstalled.
-	// otherwise resources will be cleared twice
+	// clear resources /before/ allegro is uninstalled to prevent sigsegv.
 	resources = nullptr;
 }
 
