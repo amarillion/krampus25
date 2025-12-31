@@ -169,6 +169,9 @@ void appendRichText(
 				ctx.font = style.normal;
 				ctx.color = style.linkColor;
 				break;
+			case TextSpan::TYPE_LINEBREAK:
+				// no styling associated with line breaks.
+				break;
 		}
 
 		// draw_multiline_text(font, color, 8, 8, &xcursor, &ycursor, iw, th, 0, span.content.c_str());
