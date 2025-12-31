@@ -19,6 +19,8 @@ Welcome to
 <h1>P.E.N.G.U.Ï.N</h1>
 <i>(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel)</i>.
 
+This game was created as a secret santa gift during <a href="https://tins.amarillion.org/krampu25">KrampusHack 2025</a>. Happy Holidays Elias!
+
 Each step of the way you will be presented with choices. 
 Press up / down to make a choice, then press Enter.
 Don't be afraid to try things out! 

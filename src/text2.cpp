@@ -252,6 +252,18 @@ void TextCanvas::setStyle(const StyleData &_style) {
 	style = _style;
 }
 
+ComponentPtr TextCanvas::getComponentAt(int xx, int yy) {
+	int adjx = xx - x;
+	int adjy = yy - y + yoffset;
+
+	for (auto &c: lines) {
+		if (c->contains(adjx, adjy)) {
+			return c;
+		}
+	}
+	return nullptr;
+}
+
 void ImageSegment::draw(const GraphicsContext &gc)
 {
 	if (isVisible())

@@ -52,6 +52,7 @@ public:
 	void setActiveFont(ALLEGRO_FONT *font) { assert (font != NULL); activeFont = font; }
 	void setStyle(const StyleData &style);
 	void clear();
+	ComponentPtr getComponentAt(int x, int y);
 	virtual void handleMessage(ComponentPtr src, int msg) override;
 	virtual void draw(const GraphicsContext &gc) override;
 	virtual void update() override;

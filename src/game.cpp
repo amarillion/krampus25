@@ -89,7 +89,7 @@ class AnswerComponent : public Component {
 public:
 	Answer answer;
 	bool selected;
-	virtual void draw();
+	virtual void draw(const GraphicsContext &gc) override;
 };
 
 enum GameState { ANSWERING, PAUSE };
@@ -300,6 +300,29 @@ void GameImpl::handleEvent(ALLEGRO_EVENT &event)
 		}
 	}
 
+	if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_TOUCH_BEGIN) {
+		int mx = 0, my = 0;
+		if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+			mx = event.mouse.x;
+			my = event.mouse.y;
+		}
+		else if (event.type == ALLEGRO_EVENT_TOUCH_BEGIN) {
+			mx = event.touch.x;
+			my = event.touch.y;
+		}
+
+		if (state == ANSWERING) {
+			// check for click on one of the answers first.
+			// TODO
+		}
+
+		auto comp = text.getComponentAt(mx, my);
+		if (comp) {
+			// trigger optional click handler on child text components
+			comp->handleEvent(event);
+		}
+	}
+
 	if (state != ANSWERING) return; // ignore key events
 	// the following events are only handled in ANSWERING mode
 	// TODO: break out into sub-component.
@@ -480,12 +503,12 @@ void GameImpl::draw(const GraphicsContext &gc)
 	{
 		for (AnswerComponent &comp : currentAnswers)
 		{
-			comp.draw();
+			comp.draw(gc);
 		}
 	}
 }
 
-void AnswerComponent::draw ()
+void AnswerComponent::draw (const GraphicsContext &gc)
 {
 	int xco = x;
 	int yco = y;

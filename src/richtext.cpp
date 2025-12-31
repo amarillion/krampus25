@@ -8,6 +8,7 @@
 #include <allegro5/allegro_font.h>
 #include "text.h"
 #include "multiline.h"
+#include "openLink.h"
 
 using namespace std;
 
@@ -119,8 +120,13 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 
 	if (s->span->type == TextSpan::TYPE_LINK) {
 		t->setDecoration(TextStyle::UNDERLINE);
-		//TODO: copy href.
+		string hrefcpy = s->span->href;
+		t->onClick([=](){ openLink(hrefcpy); });
 	}
+	// else {
+	// 	string lcpy = string(al_cstr(line));
+	// 	t->onClick([=](){ cout << "Clicked on span with text " << lcpy << endl; });
+	// }
 
 	t->setVisible(false); // Specifically for animated text...
 	s->components->push_back(t);
@@ -128,7 +134,9 @@ bool cb(int line_num, float xflow, float yflow, const ALLEGRO_USTR *line, void *
 	return true;
 }
 
-void appendRichText(const char *s, float *xflow, float *yflow, int iw, list<ComponentPtr> &components, const StyleData &style) {
+void appendRichText(
+	const char *s, float *xflow, float *yflow, int iw, list<ComponentPtr> &components, const StyleData &style
+) {
 	list<TextSpan> spans;
 	spans = spansFromText(s);
 	// we parse html into spans
@@ -136,6 +144,7 @@ void appendRichText(const char *s, float *xflow, float *yflow, int iw, list<Comp
 
 		CallBackContext ctx;
 		ctx.components = &components;
+	
 		ctx.xoffset = 0;
 		ctx.yoffset = 0;
 
