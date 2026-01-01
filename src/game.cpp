@@ -90,6 +90,16 @@ public:
 	Answer answer;
 	bool selected;
 	virtual void draw(const GraphicsContext &gc) override;
+
+	AnswerComponent(int x, int y, const Answer &ans, bool _selected) : answer(ans), selected(_selected) {
+		setx(x);
+		sety(y);
+		sfont = Engine::getFont();
+		setDimension(
+			al_get_text_width(sfont, answer.text.c_str()),
+			al_get_font_line_height(sfont)
+		);
+	}
 };
 
 enum GameState { ANSWERING, PAUSE };
@@ -313,7 +323,12 @@ void GameImpl::handleEvent(ALLEGRO_EVENT &event)
 
 		if (state == ANSWERING) {
 			// check for click on one of the answers first.
-			// TODO
+			for(auto &a : currentAnswers) {
+				if (a.contains(mx, my)) {
+					executeCommands (a.answer.commands);
+					return;
+				}
+			}
 		}
 
 		auto comp = text.getComponentAt(mx, my);
@@ -560,12 +575,8 @@ void GameImpl::executeCommands(vector<Command> commands)
 	bool first = true;
 	for (Answer a : answerResult)
 	{
-		AnswerComponent comp;
-		comp.answer = a;
-		comp.setx(xco);
-		comp.sety(yco);
+		AnswerComponent comp{ xco, yco, a, first };
 		yco += 20;
-		comp.selected = first;
 		first = false;
 		currentAnswers.push_back(comp);
 	}
