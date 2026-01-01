@@ -10,6 +10,8 @@
 #include <map>
 #include "point.h"
 
+#define TWIST_START_EVENT 1024    /* value for event.type - originally in widget.h */
+
 #ifdef USE_MONITORING
 #include <chrono>
 typedef std::chrono::high_resolution_clock Clock;
