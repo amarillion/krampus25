@@ -1,10 +1,10 @@
 #by Martijn van Iersel (amarillion@yahoo.com)
 
-# BUILD=DEBUG
+BUILD=DEBUG
 # BUILD=RELEASE
 
 # TARGET=EMSCRIPTEN
-# TARGET=LINUX
+TARGET=LINUX
 
 NAME=krampus25
 
