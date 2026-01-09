@@ -3,16 +3,17 @@
 #include "game.h"
 #include "container.h"
 #include "text2.h"
-#include "simpleloop.h"
+#include "mainloop.h"
 
 class Resources;
 
-class Engine : public Simple::IApp {
+class Engine : public IApp {
 
 private:
 	static std::shared_ptr<Resources> resources;
 	static ALLEGRO_FONT *font;
 	static bool debugMode;
+	bool done = false;
 public:
 	enum { E_NONE = 0, E_START, E_QUIT };
 	std::shared_ptr<Game> game;
@@ -41,5 +42,7 @@ public:
 	//TODO: Engine has series of global accessors including getFont(), getResources(), and isDebug() flag.
 
 	void init();
-	virtual bool update() override;
+	virtual void update() override;
+
+	virtual bool isDone() override { return done; };
 };

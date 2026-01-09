@@ -1,23 +1,22 @@
 #include "engine.h"
-#include "simpleloop.h"
+#include "mainloop.h"
 
 using namespace std;
 
 int main(int argc, const char *const *argv)
 {
-	Simple::MainLoop mainloop = Simple::MainLoop();
-	auto engine = make_shared<Engine>();
+	MainLoop mainloop = MainLoop();
 
 	mainloop
 		.setFixedResolution(false)
 		.setUsagiMode()
 		.setTitle("P.E.N.G.U.I.N!")
-		.setAppName("PENGUIN")
-		.setApp(engine);
-
+		.setAppName("PENGUIN");
+	
 	mainloop.setPreferredDisplayResolution(1024, 768);
-
 	mainloop.init(argc, argv);
+
+	auto engine = make_shared<Engine>();
 	engine->init();
-	mainloop.run();
+	mainloop.run(engine.get());
 }

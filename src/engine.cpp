@@ -49,16 +49,14 @@ void Engine::handleEvent(ALLEGRO_EVENT &event) {
 	game->handleEvent(event);
 }
 
-bool Engine::update() {
-	bool result = true;
+void Engine::update() {
+	
 	game->update();
 	while(game->hasMsg()) {
 		int msg = game->popMsg();
 		printf("On Handle Message called %i", msg);
-
 		if (msg == Engine::E_QUIT) {
-			result = false;
+			done = true;
 		}
 	}
-	return result;
 }
