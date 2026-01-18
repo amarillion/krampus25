@@ -7,7 +7,7 @@
 
 class Resources;
 
-class Engine : public IApp {
+class Engine : public IComponent {
 
 private:
 	static std::shared_ptr<Resources> resources;
@@ -44,5 +44,5 @@ public:
 	void init();
 	virtual void update() override;
 
-	virtual bool isDone() override { return done; };
+	virtual bool isAlive() const override { return !done; };
 };

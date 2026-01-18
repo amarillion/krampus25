@@ -253,9 +253,11 @@ void GameImpl::gameAssert(bool test, const string &value)
 
 GameImpl::GameImpl() : activeEffect("clear"), state(PAUSE), sstate()
 {
-	// layout
-	text.setLocation(80, 80, MAIN_WIDTH-160, 320);
-	particles.setLocation(0, 0, MAIN_WIDTH, MAIN_HEIGHT);
+	// TODO: use layout instead of getting display size.
+	int w = al_get_display_width(al_get_current_display());
+	int h = al_get_display_height(al_get_current_display());
+	text.setLocation(80, 80, w - 160, 320);
+	particles.setLocation(0, 0, w, h);
 }
 
 void GameImpl::update()

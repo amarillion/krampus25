@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "util.h"
+#include "mainloop.h"
 #include "menubase.h"
 #include "DrawStrategy.h"
 #include "parser.h"
