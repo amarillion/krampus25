@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "mainloop.h"
+#include "autoscalecanvas.h"
 
 using namespace std;
 
@@ -13,9 +14,9 @@ int main(int argc, const char *const *argv)
 		.setResizableWindow(true)
 		.setPreferredDisplaySize(1024, 768);
 
-	mainloop.init(argc, argv);
-
-	auto engine = make_shared<Engine>();
-	engine->init();
-	mainloop.run(engine.get());
+	if (!mainloop.init(argc, argv)) {
+		auto engine = make_shared<Engine>();
+		engine->init();
+		mainloop.run(engine.get());
+	}
 }

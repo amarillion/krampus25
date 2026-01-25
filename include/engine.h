@@ -16,9 +16,9 @@ private:
 	bool done = false;
 public:
 	enum { E_NONE = 0, E_START, E_QUIT };
-	std::shared_ptr<Game> game;
+	std::shared_ptr<Game> game = nullptr;
 
-	virtual void draw(const GraphicsContext &gc) override {
+	void draw(const GraphicsContext &gc) override {
 
 		/*
 		int ScreenW = 800; // TODO: not hardcoded
@@ -42,7 +42,9 @@ public:
 	//TODO: Engine has series of global accessors including getFont(), getResources(), and isDebug() flag.
 
 	void init();
-	virtual void update() override;
+	void update() override;
 
-	virtual bool isAlive() const override { return !done; };
+	bool isAlive() const override { return !done; };
+
+	void setSize(const Point &d) override;
 };

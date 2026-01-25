@@ -61,3 +61,9 @@ void Engine::update() {
 		}
 	}
 }
+
+void Engine::setSize(const Point &d) { 
+	if (game) {
+		game->doLayout(0, 0, d.x(), d.y());
+	}
+}

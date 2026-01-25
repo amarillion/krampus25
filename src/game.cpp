@@ -106,8 +106,8 @@ enum GameState { ANSWERING, PAUSE };
 
 class GameImpl : public Game, StatementHandler {
 private:
-	TextCanvas text; // currently displayed text component;
-	Particles particles;
+	shared_ptr<TextCanvas> text; // currently displayed text component;
+	shared_ptr<Particles> particles;
 	Squeak squeak;
 	string activeEffect;
 	GameState state;
@@ -133,9 +133,9 @@ private:
 	{
 		SimpleState newstate;
 		bool ok = newstate.load();
-		text.append ("Game loaded", MAGENTA);
+		text->append ("Game loaded", MAGENTA);
 		if (!ok) {
-			text.append ("Something went wrong while loading!", RED);
+			text->append ("Something went wrong while loading!", RED);
 			//TODO... recover
 		}
 		else
@@ -148,7 +148,7 @@ private:
 	virtual void saveGame() override
 	{
 		sstate.save();
-		text.append ("Game saved", MAGENTA);
+		text->append ("Game saved", MAGENTA);
 	}
 
 	/**
@@ -157,8 +157,8 @@ private:
 	 */
 	void clearState()
 	{
-		text.clear();
-		particles.setEffect(CLEAR);
+		text->clear();
+		particles->setEffect(CLEAR);
 		squeak.clear();
 
 		parse(STORY_FILE);
@@ -180,7 +180,7 @@ private:
 		{
 			std::stringstream ss;
 			ss << "DEBUG: Going to node: '" << id << "'";
-			text.append(ss.str(), GREY);
+			text->append(ss.str(), GREY);
 		}
 
 		sstate.currentNodeName = id;
@@ -234,7 +234,7 @@ public:
 	{
 		if (Engine::isDebug())
 		{
-			text.append(msg, color);
+			text->append(msg, color);
 		}
 	}
 
@@ -248,25 +248,31 @@ shared_ptr<Game> Game::newInstance()
 void GameImpl::gameAssert(bool test, const string &value)
 {
 	if (!test) cout << value << endl;
-	if (!test) text.append("ERROR: " + value + "\n", RED);
+	if (!test) text->append("ERROR: " + value + "\n", RED);
 }
 
 GameImpl::GameImpl() : activeEffect("clear"), state(PAUSE), sstate()
 {
-	// TODO: use layout instead of getting display size.
+	text = make_shared<TextCanvas>();
+	particles = make_shared<Particles>();
+
+	text->setLayout(Layout::LEFT_TOP_RIGHT_H, 80, 80, 80, 240);
+	particles->setLayout(Layout::LEFT_TOP_RIGHT_BOTTOM, 0, 0, 0, 0);
+	add(text);
+	add(particles);
+
 	int w = al_get_display_width(al_get_current_display());
 	int h = al_get_display_height(al_get_current_display());
-	text.setLocation(80, 80, w - 160, 320);
-	particles.setLocation(0, 0, w, h);
+	doLayout(0, 0, w, h);
 }
 
 void GameImpl::update()
 {
-	particles.update();
+	text->speedUp = Engine::isDebug();
 
-	text.speedUp = Engine::isDebug();
-	text.update();
-	bool textUpdating = text.isBusy();
+	Container::update();
+
+	bool textUpdating = text->isBusy();
 
 	switch (state)
 	{
@@ -333,7 +339,7 @@ void GameImpl::handleEvent(ALLEGRO_EVENT &event)
 			}
 		}
 
-		auto comp = text.getComponentAt(mx, my);
+		auto comp = text->getComponentAt(mx, my);
 		if (comp) {
 			// trigger optional click handler on child text components
 			comp->handleEvent(event);
@@ -389,18 +395,18 @@ void GameImpl::executeSideEffect(Command *i)
 		// Empty line means paragraph break.
 		if (i->parameter == "")
 		{
-			text.appendLine("\n\n"); // paragraph break
+			text->appendLine("\n\n"); // paragraph break
 		}
 		else
 		{
-			text.appendRich(i->parameter);
+			text->appendRich(i->parameter);
 		}
 		break;
 	case IMAGE: {
 		ALLEGRO_BITMAP *img = Engine::getResources()->getBitmapIfExists(i->parameter);
 		if (img)
 		{
-			text.appendImage(img);
+			text->appendImage(img);
 		}
 		else
 		{
@@ -430,47 +436,47 @@ void GameImpl::executeSideEffect(Command *i)
 		activeEffect = i->parameter;
 		if (i->parameter == "SNOW")
 		{
-			particles.setEffect(SNOW);
+			particles->setEffect(SNOW);
 			squeak.clear();
 		}
 		else if (i->parameter == "STARS")
 		{
-			particles.setEffect(STARS);
+			particles->setEffect(STARS);
 			squeak.clear();
 		}
 		else if (i->parameter == "METEOR")
 		{
-			particles.setEffect(METEOR);
+			particles->setEffect(METEOR);
 			squeak.clear();
 		}
 		else if (i->parameter == "ANTIGRAV")
 		{
-			particles.setEffect(ANTIGRAV);
+			particles->setEffect(ANTIGRAV);
 			squeak.clear();
 		}
 		else if (i->parameter == "CONFETTI")
 		{
-			particles.setEffect(CONFETTI);
+			particles->setEffect(CONFETTI);
 			squeak.clear();
 		}
 		else if (i->parameter == "CLEAR")
 		{
-			particles.setEffect(CLEAR);
+			particles->setEffect(CLEAR);
 			squeak.clear();
 		}
 		else if (i->parameter == "WIND")
 		{
-			particles.setEffect(WIND);
+			particles->setEffect(WIND);
 			// squeak.startWind();
 		}
 		else if (i->parameter == "POW")
 		{
-			particles.setEffect(POW);
+			particles->setEffect(POW);
 			squeak.clear();
 		}
 		else if (i->parameter == "VORTEX")
 		{
-			particles.setEffect(VORTEX);
+			particles->setEffect(VORTEX);
 			squeak.clear();
 		}
 		else
@@ -513,8 +519,8 @@ void GameImpl::draw(const GraphicsContext &gc)
 	{
 		al_draw_text(Engine::getFont(), LIGHT_BLUE, 0, geth() - 16, ALLEGRO_ALIGN_LEFT, "DEBUG ON.     F5: REFRESH. F6: LOAD. F7: SAVE. F11: DEBUG OFF");
 	}
-	particles.draw(gc);
-	text.draw(gc);
+	particles->draw(gc);
+	text->draw(gc);
 
 	if (state == ANSWERING)
 	{
@@ -545,7 +551,7 @@ void GameImpl::parse(string fname)
 
 void GameImpl::init(std::shared_ptr<Resources> res)
 {
-	text.setActiveFont(Engine::getFont());
+	text->setActiveFont(Engine::getFont());
 
 	StyleData style;
 	style.bold = res->getFont("DejaVuSans-Bold")->get(16);
@@ -557,7 +563,7 @@ void GameImpl::init(std::shared_ptr<Resources> res)
 	style.textColor = al_color_name("white");
 	style.linkColor = al_color_name("blue");
 
-	text.setStyle(style);
+	text->setStyle(style);
 
 	squeak.init();
 }
@@ -573,7 +579,7 @@ void GameImpl::executeCommands(vector<Command> commands)
 	interpreter->executeStatements(sstate, answerResult, i, commands.end());
 
 	int xco = 100;
-	int yco = 560;
+	int yco = geth() - 200;
 	bool first = true;
 	for (Answer a : answerResult)
 	{
