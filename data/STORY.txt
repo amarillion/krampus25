@@ -17,7 +17,7 @@ UNSET ALL
 Welcome to 
 
 <h1>P.E.N.G.U.Ï.N</h1>
-<i>(Penguin's Extraordinary Narrative & Genuinely Unusual Ïnteractive Novel)</i>.
+<i>(Penguin's Extraordinary Narrative &amp; Genuinely Unusual Ïnteractive Novel)</i>.
 
 This game was created as a secret santa gift during <a href="https://tins.amarillion.org/krampu25">KrampusHack 2025</a>. Happy Holidays Elias!
 
